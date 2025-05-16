@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/">
+        <file>darktheme.css</file>
+        <file>drak_ads.css</file>
+        <file>clear_input.png</file>
+        <file>clear_output.png</file>
+        <file>run_script.png</file>
+        <file>close.png</file>
+        <file>search.png</file>
+        <file>help_small.png</file>
+        <file>clear.png</file>
+        <file>app_icon.svg</file>
+    </qresource>
+</RCC>
+
+

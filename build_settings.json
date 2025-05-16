@@ -1,0 +1,11 @@
+{
+  "build_args": 
+  {
+  },
+
+  "cmake_generator": "",
+  "qt_location": "",
+  "pxrusd_location": "",
+  "build_location": "",
+  "install_location": ""
+}

@@ -1,0 +1,42 @@
+set(PYTHON_TARGET_NAME _${PROJECT_NAME})
+
+add_library(${PYTHON_TARGET_NAME} SHARED)
+
+target_sources(${PYTHON_TARGET_NAME} 
+    PRIVATE
+        module.cpp
+        wrapGlobal.cpp
+)
+
+compile_config(${PYTHON_TARGET_NAME})
+
+target_compile_definitions(${PYTHON_TARGET_NAME}
+    PRIVATE
+        MFB_PACKAGE_NAME=${PROJECT_NAME}
+        MFB_ALT_PACKAGE_NAME=${PROJECT_NAME}
+        MFB_PACKAGE_MODULE=${PROJECT_NAME}
+)
+
+set_target_properties(${PYTHON_TARGET_NAME}
+       PROPERTIES
+           PREFIX ""
+           SUFFIX ".pyd"
+)
+
+target_link_libraries(${PYTHON_TARGET_NAME}
+    PRIVATE
+        ${PROJECT_NAME}
+)
+
+set(PYLIB_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/lib/python/${PROJECT_NAME}/lib)
+
+install(TARGETS ${PYTHON_TARGET_NAME}
+    LIBRARY
+    DESTINATION ${PYLIB_INSTALL_PREFIX}
+    ARCHIVE
+    DESTINATION ${PYLIB_INSTALL_PREFIX}
+    RUNTIME
+    DESTINATION ${PYLIB_INSTALL_PREFIX}
+)
+
+install(FILES __init__.py DESTINATION ${PYLIB_INSTALL_PREFIX})

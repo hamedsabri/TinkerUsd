@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2C3E50" />
+      <stop offset="100%" stop-color="#1A2533" />
+    </linearGradient>
+    <linearGradient id="usdGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8E44AD" />
+      <stop offset="100%" stop-color="#9B59B6" />
+    </linearGradient>
+    <linearGradient id="blueGearGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3498DB" />
+      <stop offset="50%" stop-color="#2980B9" />
+      <stop offset="100%" stop-color="#1F618D" />
+    </linearGradient>
+    <linearGradient id="tealGearGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1ABC9C" />
+      <stop offset="50%" stop-color="#16A085" />
+      <stop offset="100%" stop-color="#0E6655" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="10" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+    <filter id="innerShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+      <feOffset in="blur" dx="0" dy="0" result="offsetBlur"/>
+      <feComposite in="SourceGraphic" in2="offsetBlur" operator="over"/>
+    </filter>
+  </defs>
+  
+  <!-- Rounded square background -->
+  <rect x="32" y="32" width="448" height="448" rx="90" ry="90" fill="url(#bgGradient)" />
+  
+  <!-- USD Cube -->
+  <g filter="url(#shadow)">
+    <path d="M256 130 L356 180 L356 280 L256 330 L156 280 L156 180 Z" fill="url(#usdGradient)" />
+    <!-- USD Letters -->
+    <text x="256" y="260" font-family="Arial, sans-serif" font-size="60" font-weight="bold" text-anchor="middle" fill="#ffffff">USD</text>
+  </g>
+  
+  <!-- Main Blue Gear - Rounded Style -->
+  <g filter="url(#shadow)">
+    <!-- Main gear with rounded teeth -->
+    <circle cx="252" cy="275" r="80" fill="url(#blueGearGradient)" />
+    
+    <!-- Rounded teeth -->
+    <circle cx="252" cy="195" r="15" fill="url(#blueGearGradient)" />
+    <circle cx="252" cy="355" r="15" fill="url(#blueGearGradient)" />
+    <circle cx="172" cy="275" r="15" fill="url(#blueGearGradient)" />
+    <circle cx="332" cy="275" r="15" fill="url(#blueGearGradient)" />
+    
+    <circle cx="194" cy="217" r="15" fill="url(#blueGearGradient)" />
+    <circle cx="310" cy="217" r="15" fill="url(#blueGearGradient)" />
+    <circle cx="194" cy="333" r="15" fill="url(#blueGearGradient)" />
+    <circle cx="310" cy="333" r="15" fill="url(#blueGearGradient)" />
+    
+    <!-- Inner details -->
+    <circle cx="252" cy="275" r="65" fill="#2C3E50" />
+    <circle cx="252" cy="275" r="55" fill="url(#blueGearGradient)" />
+    <circle cx="252" cy="275" r="45" fill="#2C3E50" />
+    <circle cx="252" cy="275" r="35" fill="url(#blueGearGradient)" />
+    
+    <!-- Decorative bolts -->
+    <circle cx="252" cy="240" r="6" fill="#2C3E50" stroke="#3498DB" stroke-width="2" />
+    <circle cx="252" cy="310" r="6" fill="#2C3E50" stroke="#3498DB" stroke-width="2" />
+    <circle cx="217" cy="275" r="6" fill="#2C3E50" stroke="#3498DB" stroke-width="2" />
+    <circle cx="287" cy="275" r="6" fill="#2C3E50" stroke="#3498DB" stroke-width="2" />
+    
+    <!-- Center hole -->
+    <circle cx="252" cy="275" r="20" fill="#1A2533" stroke="#3498DB" stroke-width="2" />
+  </g>
+  
+  <!-- Small Teal Gear - Rounded Style -->
+  <g filter="url(#shadow)">
+    <!-- Small gear body -->
+    <circle cx="160" cy="360" r="35" fill="url(#tealGearGradient)" />
+    
+    <!-- Rounded teeth -->
+    <circle cx="160" cy="325" r="8" fill="url(#tealGearGradient)" />
+    <circle cx="160" cy="395" r="8" fill="url(#tealGearGradient)" />
+    <circle cx="125" cy="360" r="8" fill="url(#tealGearGradient)" />
+    <circle cx="195" cy="360" r="8" fill="url(#tealGearGradient)" />
+    
+    <circle cx="138" cy="338" r="8" fill="url(#tealGearGradient)" />
+    <circle cx="182" cy="338" r="8" fill="url(#tealGearGradient)" />
+    <circle cx="138" cy="382" r="8" fill="url(#tealGearGradient)" />
+    <circle cx="182" cy="382" r="8" fill="url(#tealGearGradient)" />
+    
+    <!-- Inner details -->
+    <circle cx="160" cy="360" r="25" fill="#2C3E50" />
+    <circle cx="160" cy="360" r="20" fill="url(#tealGearGradient)" />
+    <circle cx="160" cy="360" r="12" fill="#2C3E50" />
+    
+    <!-- Center hole -->
+    <circle cx="160" cy="360" r="8" fill="#1A2533" stroke="#1ABC9C" stroke-width="1" />
+  </g>
+</svg>
