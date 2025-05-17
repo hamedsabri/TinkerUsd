@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <memory>
-\
+
 namespace TINKERUSD_NS
 {
 class UsdCamera;
