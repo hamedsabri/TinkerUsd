@@ -15,7 +15,7 @@ TinkerUsd is an experimental project written in C++ for R&D purposes. This proje
 
 ## How to Build
 
-This project currently is supported on **Windows** only at the moment. I just haven't had time to get this on Linux or MacOs.
+This project is supported on **Windows** only at the moment. I just haven't had time to get this on Linux or MacOs.
 
 #### Requirements
 
@@ -50,7 +50,7 @@ e.g
 build.py --stages=clean,configure,build,install
 ```
 
-This is how the install directory will look like after the build/install stages finish.
+This is how the install directory looks like after the build/install stages finish.
 
 ```
 > tree /F 
@@ -82,5 +82,3 @@ Before running the executable, both **PYTHONPATH** and **PXR_USD_WINDOWS_DLL_PAT
 set PXR_USD_WINDOWS_DLL_PATH=%PXR_USD_WINDOWS_DLL_PATH%;<install_location>\lib
 set PYTHONPATH=%PYTHONPATH%;<install_location>\lib\python
 ```
-
-
