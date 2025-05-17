@@ -4,14 +4,14 @@ TinkerUsd is an experimental project written in C++ for R&D purposes. This proje
 ![](docs/images/screenshot.png)
 
 # Features
+- [Property Editor](source/ui/propertyEditor/README.md)
+- Integrated Python Script Editor
+- API Python bindings using Pixar's boost
 - Hydra OpenGL Rendering with Viewport ( sRGB support )
 - Perspective Camera System (dolly, pan, zoom)
-- Integrated Python Script Editor
-- Property Editor
 - Composition Inspector
 - Outliner
 - Basic Selection
-- API Python bindings using pixar's boost
 
 ## How to Build
 
