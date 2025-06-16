@@ -80,6 +80,11 @@ PXR_NS::UsdImagingGLRenderParams& UsdRenderEngineGL::params()
     return m_params; 
 }
 
+pxr::UsdImagingGLEngine* UsdRenderEngineGL::getUsdImagingGLEngine() const
+{ 
+    return m_usdGLEngine.get(); 
+}
+
 std::string UsdRenderEngineGL::rendererDisplayName() const
 {
     return m_usdGLEngine->GetRendererDisplayName(m_usdGLEngine->GetCurrentRendererId());

@@ -75,7 +75,7 @@ private:
     std::unique_ptr<UsdCamera>         m_usdCamera;
     std::unique_ptr<UsdDrawTargetFBO>  m_drawTarget;
     std::unique_ptr<UsdRenderEngineGL> m_renderEngineGL;
-    PXR_NS::UsdStageRefPtr                m_stage;
+    PXR_NS::UsdStageRefPtr             m_stage;
     QPoint                             m_lastMousePosition;
     TfNotice::Key                      m_ObjectsChangedKey;
     double                             m_height;

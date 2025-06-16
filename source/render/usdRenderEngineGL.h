@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <memory>
-\
+
 namespace TINKERUSD_NS
 {
 class UsdCamera;
@@ -24,6 +24,7 @@ public:
     void updateSelection(const PXR_NS::SdfPath& path);
 
     PXR_NS::UsdImagingGLRenderParams& params();
+    pxr::UsdImagingGLEngine* getUsdImagingGLEngine() const; 
 
     std::vector<std::string> getRendererAovs() const;
     void                     setRendererAov(const std::string& name);
@@ -31,7 +32,7 @@ public:
     std::string rendererDisplayName() const;
 
 private:
-    Ptr                           m_usdGLEngine;
+    Ptr                              m_usdGLEngine;
     PXR_NS::UsdImagingGLRenderParams m_params;
     PXR_NS::UsdStageRefPtr           m_stage;
 

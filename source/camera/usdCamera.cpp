@@ -27,8 +27,6 @@ UsdCamera::UsdCamera(PXR_NS::UsdStageRefPtr stage)
     m_center = m_bbox.ComputeCentroid();
     m_range = m_bbox.ComputeAlignedRange();
 
-    m_camera.SetClippingRange(GfRange1f(m_nearClip, m_farClip));
-
     frameBoundingBox();
 }
 
@@ -78,6 +76,16 @@ void UsdCamera::updateTransform()
 
     matrix *= GfMatrix4d().SetTranslate(m_center);
     m_camera.SetTransform(matrix);
+
+    if (m_camera.GetProjection() == GfCamera::Perspective) {
+        // reset projection
+        m_camera.SetPerspectiveFromAspectRatioAndFieldOfView(m_aspectRatio, m_fov, GfCamera::FOVVertical);
+
+        m_camera.SetFocusDistance(m_distance);
+        m_camera.SetClippingRange(GfRange1f(m_nearClip, m_farClip));
+        CameraUtilConformWindowPolicy policy = CameraUtilConformWindowPolicy::CameraUtilFit;
+        CameraUtilConformWindow(&m_camera, policy, m_aspectRatio);
+    }
 }
 
 void UsdCamera::frameBoundingBox()
@@ -95,14 +103,9 @@ void UsdCamera::frameBoundingBox()
         auto fovangle = m_camera.GetFieldOfView(GfCamera::FOVHorizontal);
         auto lengthToFit = maxsize * 0.5;
         m_distance = lengthToFit / std::atan(fovangle * PI / 180.0);
-        if (m_distance < m_nearClip + maxsize * 0.5)
-        {
+        if (m_distance < m_nearClip + maxsize * 0.5) {
             m_distance = m_nearClip + lengthToFit;
         }
-
-        // reset projection
-        m_camera.SetPerspectiveFromAspectRatioAndFieldOfView(
-            16.0 / 9.0, m_fov, GfCamera::FOVVertical);
 
         updateTransform();
     }

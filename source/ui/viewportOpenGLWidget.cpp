@@ -133,6 +133,9 @@ void ViewportOpenGLWidget::paintGL()
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
 
+    m_renderEngineGL->params().cullStyle
+        = UsdImagingGLCullStyle::CULL_STYLE_BACK_UNLESS_DOUBLE_SIDED;
+
     switch (m_shadingMode)
     {
     case ShadingMode::POINTS:
@@ -166,6 +169,7 @@ void ViewportOpenGLWidget::paintGL()
     m_renderEngineGL->params().showRender = true;
     m_renderEngineGL->params().complexity = 1.0;
 
+    m_usdCamera->setAspectRatio( m_width / std::max(1.0, m_height) );
     m_renderEngineGL->updateSelection(GlobalSelection::instance().path());
     m_renderEngineGL->render(m_stage, m_usdCamera.get(), m_width, m_height);
 
@@ -183,7 +187,7 @@ void ViewportOpenGLWidget::wheelEvent(QWheelEvent* event)
 
 void ViewportOpenGLWidget::mousePressEvent(QMouseEvent* event)
 {
-    m_lastMousePosition = event->pos() * devicePixelRatioF();
+    m_lastMousePosition = event->pos() * devicePixelRatio();
 
     if (event->modifiers() & (Qt::AltModifier | Qt::MetaModifier)) {
         if (event->button() == Qt::LeftButton) {
@@ -195,12 +199,47 @@ void ViewportOpenGLWidget::mousePressEvent(QMouseEvent* event)
         else if (event->button() == Qt::MiddleButton) {
             m_usdCamera->setDragMode(UsdCamera::DragMode::PAN);
         }
+    } else {
+
+        // NOTE: Explicitly set Depth Mask to True
+        // OtherWise TestIntersection fails to pick
+        glDepthMask(GL_TRUE);
+
+        // normalize position and pick size by the viewport size
+        auto pos = pxr::GfVec2d(m_lastMousePosition.x() / m_width, 
+                                m_lastMousePosition.y() / m_height);
+
+        pos[0] = (pos[0] * 2.0 - 1.0);
+        pos[1] = -1.0 * (pos[1] * 2.0 - 1.0);
+        
+        auto size = pxr::GfVec2d(1.0f / m_width, 1.0f / m_height);
+        auto cameraFrustum = m_usdCamera->getCamera().GetFrustum();
+        auto pickFrustum = cameraFrustum.ComputeNarrowedFrustum(pos, size);
+
+        pxr::GfVec3d outHitNormal;
+        pxr::GfVec3d outHitPoint;
+        pxr::SdfPath outHitInstancerPath;
+        pxr::SdfPath outHitPrimPath;
+        auto hit = m_renderEngineGL->getUsdImagingGLEngine()->TestIntersection(pickFrustum.ComputeViewMatrix(), 
+                                                                               pickFrustum.ComputeProjectionMatrix(),
+                                                                               m_stage->GetPseudoRoot(),
+                                                                               m_renderEngineGL->params(),
+                                                                               &outHitPoint, 
+                                                                               &outHitNormal,
+                                                                               &outHitPrimPath, 
+                                                                               &outHitInstancerPath);
+        if ( hit ) {
+            auto hitPrim = m_stage->GetPrimAtPath(outHitPrimPath);
+            GlobalSelection::instance().setPrim(hitPrim);
+        } else {
+            GlobalSelection::instance().clearSelection();
+        }
     }
 }
 
 void ViewportOpenGLWidget::mouseMoveEvent(QMouseEvent* event)
 {
-    QPoint currentMousePosition = event->pos() * devicePixelRatioF();
+    QPoint currentMousePosition = event->pos() * devicePixelRatio();
 
     QPoint delta = currentMousePosition - m_lastMousePosition;
     if (delta.x() == 0 && delta.y() == 0) {
@@ -219,7 +258,7 @@ void ViewportOpenGLWidget::mouseMoveEvent(QMouseEvent* event)
         m_usdCamera->zoom(zoomDelta);
     }
 
-    m_lastMousePosition = event->pos() * devicePixelRatioF();
+    m_lastMousePosition = event->pos() * devicePixelRatio();
 
     update();
 }
