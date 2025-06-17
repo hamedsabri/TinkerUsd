@@ -46,6 +46,8 @@ void ViewportOpenGLWidget::onSelectionChanged()
 {
     m_renderEngineGL->addSelectionHighlighting();
 
+    m_renderEngineGL->addBboxRenderParams( globalSelectionBbox( m_stage ) );
+
     update();
 }
 
@@ -55,6 +57,9 @@ void ViewportOpenGLWidget::onUsdObjectChanged(const UsdNotice::ObjectsChanged& n
     const auto& changedPaths = notice.GetChangedInfoOnlyPaths();
 
     if (!resyncedPaths.empty() || !changedPaths.empty()) {
+
+        m_renderEngineGL->addBboxRenderParams( globalSelectionBbox( m_stage ) );
+
         update();
     }
 }
@@ -173,7 +178,6 @@ void ViewportOpenGLWidget::paintGL()
     m_renderEngineGL->params().showProxy = true;
     m_renderEngineGL->params().showRender = true;
     m_renderEngineGL->params().complexity = 1.0;
-    m_renderEngineGL->addBboxRenderParams( globalSelectionBbox( m_stage ) );
 
     m_renderEngineGL->render(m_stage, m_usdCamera.get(), m_width, m_height);
 
