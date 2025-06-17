@@ -39,8 +39,6 @@ GfMatrix4d UsdCamera::getProjectionMatrix() const
     return m_camera.GetFrustum().ComputeProjectionMatrix();
 }
 
-GfBBox3d UsdCamera::getStageBBox() const { return m_bbox; }
-
 void UsdCamera::setBoundingBox(const GfBBox3d& bBox)
 {
     if (m_bbox != bBox)

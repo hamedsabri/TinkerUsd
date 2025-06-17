@@ -42,7 +42,12 @@ ViewportOpenGLWidget::~ViewportOpenGLWidget()
     }
 }
 
-void ViewportOpenGLWidget::onSelectionChanged() { update(); }
+void ViewportOpenGLWidget::onSelectionChanged()
+{
+    m_renderEngineGL->addSelectionHighlighting();
+
+    update();
+}
 
 void ViewportOpenGLWidget::onUsdObjectChanged(const UsdNotice::ObjectsChanged& notice)
 {
@@ -73,7 +78,7 @@ void ViewportOpenGLWidget::initialize()
 
     m_usdCamera = std::make_unique<UsdCamera>(m_stage);
     m_renderEngineGL = std::make_unique<UsdRenderEngineGL>();
-    m_renderEngineGL->initialize(m_stage, m_usdCamera.get());
+    m_renderEngineGL->initialize( m_stage );
 }
 
 void ViewportOpenGLWidget::onStageOpened(const QString& filePath)
@@ -168,9 +173,8 @@ void ViewportOpenGLWidget::paintGL()
     m_renderEngineGL->params().showProxy = true;
     m_renderEngineGL->params().showRender = true;
     m_renderEngineGL->params().complexity = 1.0;
+    m_renderEngineGL->addBboxRenderParams( globalSelectionBbox( m_stage ) );
 
-    m_usdCamera->setAspectRatio( m_width / std::max(1.0, m_height) );
-    m_renderEngineGL->updateSelection(GlobalSelection::instance().path());
     m_renderEngineGL->render(m_stage, m_usdCamera.get(), m_width, m_height);
 
     m_drawTarget->unbind();

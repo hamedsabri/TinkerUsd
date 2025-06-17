@@ -1,26 +1,24 @@
 #include "usdRenderEngineGL.h"
 
 #include "camera/usdCamera.h"
+#include "core/globalSelection.h"
+
+#include <pxr/usdImaging/usdImaging/delegate.h>
 
 #include <pxr/usd/usd/prim.h>
-#include <pxr/usdImaging/usdImaging/delegate.h>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace TINKERUSD_NS
 {
 
-void UsdRenderEngineGL::initialize(const PXR_NS::UsdStageRefPtr& stage, UsdCamera* camera)
+void UsdRenderEngineGL::initialize(const PXR_NS::UsdStageRefPtr& stage)
 {
     PXR_NS::SdfPathVector excludedPaths;
     m_usdGLEngine = std::make_unique<PXR_NS::UsdImagingGLEngine>(
         stage->GetPseudoRoot().GetPath(), excludedPaths);
 
-    // bbox
-    m_params.bboxes.clear();
-    m_params.bboxes.emplace_back(camera->getStageBBox());
-    m_params.bboxLineColor = GfVec4f(1.0f, 1.0f, 1.0f, 1.0f); // White
-    m_params.bboxLineDashSize = 3;
+    addBboxRenderParams( stageBbox( stage ) );
 
     // camera light
     m_cameraLight.SetAmbient({ 0.1, 0.1, 0.1, 1.0 });
@@ -43,6 +41,8 @@ void UsdRenderEngineGL::render(
     double                     w,
     double                     h)
 {
+    camera->setAspectRatio( w / std::max(1.0, h) );
+
     camera->updateTransform();
 
     m_usdGLEngine->SetCameraState(camera->getViewMatrix(), camera->getProjectionMatrix());
@@ -66,13 +66,6 @@ void UsdRenderEngineGL::render(
 
     m_usdGLEngine->SetRendererAov(TfToken(m_aov));
     m_usdGLEngine->Render(stage->GetPseudoRoot(), m_params);
-}
-
-void UsdRenderEngineGL::updateSelection(const PXR_NS::SdfPath& path)
-{
-    m_usdGLEngine->ClearSelected();
-    m_usdGLEngine->SetSelectionColor(PXR_NS::GfVec4f(1.0f, 1.0f, 0.0f, 0.5f));
-    m_usdGLEngine->AddSelected(path, PXR_NS::UsdImagingDelegate::ALL_INSTANCES);
 }
 
 PXR_NS::UsdImagingGLRenderParams& UsdRenderEngineGL::params() 
@@ -102,6 +95,20 @@ std::vector<std::string> UsdRenderEngineGL::getRendererAovs() const
 void UsdRenderEngineGL::setRendererAov(const std::string& name) 
 { 
     m_aov = name; 
+}
+
+void UsdRenderEngineGL::addBboxRenderParams(const GfBBox3d& bBox)
+{
+    m_params.bboxes.clear();
+    m_params.bboxes.emplace_back(bBox);
+    m_params.bboxLineColor = GfVec4f(1.0f, 1.0f, 1.0f, 1.0f);
+    m_params.bboxLineDashSize = 5;
+}
+
+void UsdRenderEngineGL::addSelectionHighlighting()
+{
+    m_usdGLEngine->ClearSelected();
+    m_usdGLEngine->AddSelected(GlobalSelection::instance().path(), PXR_NS::UsdImagingDelegate::ALL_INSTANCES);
 }
 
 } // namespace TINKERUSD_NS

@@ -34,8 +34,6 @@ public:
     // returns projection matrix
     GfMatrix4d getProjectionMatrix() const;
 
-    GfBBox3d getStageBBox() const;
-
     void setBoundingBox(const GfBBox3d& bBox);
 
     // update the camera's transform matrix
