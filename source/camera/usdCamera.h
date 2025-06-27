@@ -18,7 +18,7 @@ public:
     enum class DragMode
     {
         NONE,
-        DOLLY,
+        ORBIT,
         PAN,
         ZOOM
     };
@@ -51,7 +51,7 @@ public:
     DragMode getDragMode() const;
     void     setDragMode(DragMode dragMode);
 
-    void dolly(double x, double y);
+    void orbit(double x, double y);
     void pan(double x, double y);
     void zoom(double zoomFactor);
 
