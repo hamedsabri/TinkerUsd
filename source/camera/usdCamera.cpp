@@ -147,7 +147,7 @@ void UsdCamera::setDragMode(UsdCamera::DragMode dragMode)
     m_dragMode = dragMode; 
 }
 
-void UsdCamera::dolly(double x, double y)
+void UsdCamera::orbit(double x, double y)
 {
     m_rotTheta += x;
     m_rotPhi += y;

@@ -26,6 +26,15 @@ class ViewportOpenGLWidget
 {
     Q_OBJECT
 public:
+    enum class ViewportLayoutMode
+    {
+        SINGLE,
+        TWO_UP_HORIZONTAL,
+        TWO_UP_VERTICAL,
+        FOUR_UP
+    };
+    Q_ENUM(ViewportLayoutMode)
+
     enum class ShadingMode
     {
         SHADEDSMOOTH,
@@ -49,6 +58,15 @@ public:
 
     void setRendererAov(const std::string& name);
     std::vector<std::string> getRendererAovs() const;
+
+    void setViewportLayoutMode(ViewportLayoutMode mode);
+    ViewportLayoutMode viewportLayoutMode() const;
+
+    void setLightingEnabled(bool enabled);
+    bool isLightingEnabled() const;
+
+    void setGridEnabled(bool enabled);
+    bool isGridEnabled() const;
 
 protected:
     void initializeGL() override;
@@ -81,6 +99,23 @@ private:
     double                             m_height;
     double                             m_width;
     ShadingMode                        m_shadingMode;
+    ViewportLayoutMode                 m_viewportLayoutMode;
+    std::vector<QRect>                 m_viewportRects;
+    int                                m_activeViewportIndex; // For now, primarily for input routing
+
+    // Store multiple instances for multi-viewport layouts
+    std::vector<std::unique_ptr<UsdCamera>>         m_cameras;
+    std::vector<std::unique_ptr<UsdDrawTargetFBO>>  m_drawTargets;
+    std::vector<std::unique_ptr<UsdRenderEngineGL>> m_renderEngines;
+
+    bool                               m_lightingEnabled;
+    bool                               m_gridEnabled;
+
+    UsdCamera* getActiveCamera();
+    UsdRenderEngineGL* getActiveRenderEngine();
+    int getViewportIndexForPoint(const QPoint& point);
+    void updateViewportRects();
+    void initializeViewportResources(int count);
 };
 
 } // namespace TINKERUSD_NS
