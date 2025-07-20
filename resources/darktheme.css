@@ -137,6 +137,11 @@ QTreeView, QTableView, QTableWidget, QTreeWidget {
     selection-color: white;
 }
 
+QTreeView::item:selected {
+    background-color: #515f8d;
+    color: black;
+}
+
 QTableCornerButton::section {
     background-color: #2b2b2b;
     border: 1px solid #2b2b2b;

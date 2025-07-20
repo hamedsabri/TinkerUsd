@@ -29,6 +29,7 @@ target_include_directories(${TARGET_NAME}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${USD_INCLUDE_DIR}
+        ${CMAKE_BINARY_DIR}/include
 )
 
 # -----------------------------------------------------------------------------
@@ -84,3 +85,4 @@ add_subdirectory(render)
 add_subdirectory(ui)
 add_subdirectory(camera)
 add_subdirectory(pythonAPI)
+add_subdirectory(undo)

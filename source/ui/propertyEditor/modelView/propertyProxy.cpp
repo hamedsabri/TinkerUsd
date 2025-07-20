@@ -1,5 +1,5 @@
 #include "propertyproxy.h"
-
+#include "common/utils.h"
 #include "valueEditors/abstractPropertyEditor.h"
 
 namespace TINKERUSD_NS
@@ -7,13 +7,15 @@ namespace TINKERUSD_NS
 
 PropertyProxy::PropertyProxy(QObject* parent)
     : QSortFilterProxyModel(parent)
-    , m_specialKeyword(SpecialFilterKeyword::None)
 {
 }
 
 void PropertyProxy::setSpecialFilter(SpecialFilterKeyword keyword)
 {
     m_specialKeyword = keyword;
+
+    // HS: this call is important. we need to tell the proxy model to re-evaluate the
+    // items based on the new criteria.
     invalidateFilter();
 }
 
@@ -22,37 +24,34 @@ bool PropertyProxy::filterAcceptsRow(int sourceRow, const QModelIndex& sourcePar
     QModelIndex index0 = sourceModel()->index(sourceRow, 0, sourceParent);
     QModelIndex index1 = sourceModel()->index(sourceRow, 1, sourceParent);
 
-    AbstractPropertyEditor* property
-        = static_cast<AbstractPropertyEditor*>(index1.data(Qt::UserRole).value<void*>());
-    if (m_specialKeyword == SpecialFilterKeyword::ModifiedValue)
-    {
-        if (property && !property->isDefault())
-        {
+    auto propertyEditor = TINKERUSD_NS::Utils::getEditorFromIndex(index1);
+    if (m_specialKeyword == SpecialFilterKeyword::ModifiedValue) {
+        if (propertyEditor && !propertyEditor->isDefault()) {
             return true;
         }
     }
-    else if (m_specialKeyword == SpecialFilterKeyword::DefaultValue)
-    {
-        if (property && property->isDefault())
-        {
+    else if (m_specialKeyword == SpecialFilterKeyword::DefaultValue) {
+        if (propertyEditor && propertyEditor->isDefault()) {
             return true;
         }
     }
 
-    // Check if this is a group item
-    if (sourceModel()->hasChildren(index0))
-    {
-        for (int i = 0; i < sourceModel()->rowCount(index0); ++i)
-        {
-            if (filterAcceptsRow(i, index0))
-            {
-                return true; // If any child passes the filter, accept the group item
-            }
-        }
-        return false; // No children passed the filter, so hide the group item
+    // normal filtering by property name
+    QString propertyName = sourceModel()->data(index0).toString();
+
+    if (filterRegularExpression().match(propertyName).hasMatch()) {
+        return true;
     }
 
-    // Perform filtering based on the standard role (usually Qt::DisplayRole)
-    return sourceModel()->data(index0).toString().contains(filterRegularExpression());
+    // recursively check children
+    int childCount = sourceModel()->rowCount(index0);
+    for (int i = 0; i < childCount; ++i) {
+        if (filterAcceptsRow(i, index0)) {
+            return true;
+        }
+    }
+
+    return false;
 }
+
 } // namespace TINKERUSD_NS

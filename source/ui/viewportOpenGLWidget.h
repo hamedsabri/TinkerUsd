@@ -4,6 +4,7 @@
 #include "core/utils.h"
 #include "render/usdDrawTargetFBO.h"
 #include "render/usdRenderEngineGL.h"
+#include "render/grid.h"
 
 #include <QOpenGLFunctions_4_5_Core>
 #include <QOpenGLWidget>
@@ -43,6 +44,7 @@ public:
     DISALLOW_COPY_MOVE_ASSIGNMENT(ViewportOpenGLWidget);
 
     QString rendererDisplayName() const;
+    QString upAxisDisplayName() const;
 
     void setShadingMode(ShadingMode mode);
     ShadingMode shadingMode() const;
@@ -70,11 +72,16 @@ Q_SIGNALS:
 private slots:
     void onStageOpened(const QString& filePath);
 
+public slots:
+    void frameSelected();
+    void reset();
+
 private:
     UsdDocument*                       m_usdDocument;
     std::unique_ptr<UsdCamera>         m_usdCamera;
     std::unique_ptr<UsdDrawTargetFBO>  m_drawTarget;
     std::unique_ptr<UsdRenderEngineGL> m_renderEngineGL;
+    std::unique_ptr<Grid>              m_grid;
     PXR_NS::UsdStageRefPtr             m_stage;
     QPoint                             m_lastMousePosition;
     TfNotice::Key                      m_ObjectsChangedKey;

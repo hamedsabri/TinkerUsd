@@ -9,25 +9,19 @@ namespace TINKERUSD_NS
 {
 
 /**
- * @class SliderGroupWidgetBase
- * @brief A base class for slider group widgets that provides common functionality such as signals
- * and slots.
+ * @class AbstractSliderGroupWidget
+ * @brief A base class for slider group widgets that provides common functionality such as signals and slots.
  *
- * This class cannot directly mix Q_OBJECT with templates, hence it serves as a common
+ * This class cannot directly mix Q_OBJECT with templates, hence it serves as a common 
  * interface for derived template-based slider widgets.
  */
-class SliderGroupWidgetBase : public QWidget
+class AbstractSliderGroupWidget : public QWidget
 {
     Q_OBJECT
 public:
-    // constructor
-    SliderGroupWidgetBase(QWidget* parent = nullptr)
-        : QWidget(parent)
-    {
-    }
+    AbstractSliderGroupWidget(QWidget *parent = nullptr) : QWidget(parent) {}
 
-    // destructor
-    virtual ~SliderGroupWidgetBase() = default;
+    virtual ~AbstractSliderGroupWidget() = default;
 
     // returns the current value.
     virtual QVariant getValue() const = 0;
@@ -36,7 +30,7 @@ public:
     virtual void setValue(const QVariant& value) = 0;
 
 signals:
-    // signal emitted when the data should be committed.
+    // signal emitted when the data needs to be committed.
     void commitData();
 
 public slots:
@@ -50,22 +44,16 @@ public slots:
 /**
  * @struct NumericGroupSliderData
  * @brief A structure to hold data for numeric group sliders.
- *
  */
-template <typename T> struct NumericGroupSliderData
+template<typename T>
+struct NumericGroupSliderData 
 {
     QPair<T, T> m_range;
-    T           m_defaultValue;
+    T m_defaultValue;
 
-    NumericGroupSliderData()
-        : m_defaultValue(0)
-    {
-    }
-    NumericGroupSliderData(const QPair<T, T>& range, T defaultValue)
-        : m_range(range)
-        , m_defaultValue(defaultValue)
-    {
-    }
+    NumericGroupSliderData() : m_defaultValue(0) {}
+    NumericGroupSliderData(const QPair<T, T>& range, T defaultValue) 
+        : m_range(range), m_defaultValue(defaultValue) {}
 };
 
 Q_DECLARE_METATYPE(TINKERUSD_NS::NumericGroupSliderData<int32_t>)
@@ -76,18 +64,22 @@ Q_DECLARE_METATYPE(TINKERUSD_NS::NumericGroupSliderData<double>)
 /**
  * @class NumericSliderGroupWidget
  * @brief A template-based widget for a numeric slider group.
- *
+ * 
  */
-template <typename T> class NumericSliderGroupWidget : public SliderGroupWidgetBase
+template<typename T>
+class NumericSliderGroupWidget : public AbstractSliderGroupWidget
 {
 public:
-    // constructor
-    NumericSliderGroupWidget(QWidget* parent = nullptr);
+    using SliderGroupType = typename std::conditional<std::disjunction<std::is_same<T, int32_t>,
+                                                      std::is_same<T, uint32_t>>::value,
+                                                      IntSliderGroup,
+                                                      FloatSliderGroup>::type;
+    
+    NumericSliderGroupWidget(QWidget *parent = nullptr);
 
-    // destructor
-    ~NumericSliderGroupWidget() = default;
+    virtual ~NumericSliderGroupWidget() = default;
 
-    // Returns the current value of the slider as a QVariant.
+    // returns the current value of the slider as a QVariant.
     QVariant getValue() const override;
 
     // sets the current value.
@@ -97,25 +89,27 @@ public:
     void setRange(const QPair<T, T>& range);
 
 private:
-    IncrementalSliderGroup* m_sliderGroup { nullptr };
+    // HS TODO: this conditional type-trait can go away once the custom widget slider/number-line
+    // are templated.
+    SliderGroupType* m_sliderGroup;
 };
 
 /**
  * @class NumericEditor
  * @brief A template-based property editor for numeric values.
- *
+ * 
  */
-template <typename T> class NumericEditor : public AbstractPropertyEditor
+template<typename T>
+class NumericEditor : public AbstractPropertyEditor
 {
 public:
-    // constructor
-    NumericEditor(
-        const QString&                   name,
-        const NumericGroupSliderData<T>& groupSliderData,
-        const QString&                   tooltip = QString());
+    
+    NumericEditor(const QString &name, 
+                  const NumericGroupSliderData<T>& groupSliderData, 
+                  const QString &tooltip = QString());
 
-    // destructor
-    ~NumericEditor() = default;
+    
+    virtual ~NumericEditor() = default;
 
     // converts a QVariant value to a VtValue.
     PXR_NS::VtValue toVtValue(const QVariant& value) const override;
@@ -136,14 +130,14 @@ private:
     QPair<T, T> m_range;
 };
 
-using IntegerGroupSliderData = NumericGroupSliderData<int32_t>;
+using IntegerGroupSliderData         = NumericGroupSliderData<int32_t>;
 using UnsignedIntegerGroupSliderData = NumericGroupSliderData<uint32_t>;
-using FloatGroupSliderData = NumericGroupSliderData<float>;
-using DoubleGroupSliderData = NumericGroupSliderData<double>;
+using FloatGroupSliderData           = NumericGroupSliderData<float>;
+using DoubleGroupSliderData          = NumericGroupSliderData<double>;
 
-using IntegerEditor = NumericEditor<int32_t>;
-using UnsignedIntegerEditor = NumericEditor<uint32_t>;
-using FloatEditor = NumericEditor<float>;
-using DoubleEditor = NumericEditor<double>;
+using IntegerEditor                  = NumericEditor<int32_t>;
+using UnsignedIntegerEditor          = NumericEditor<uint32_t>;
+using FloatEditor                    = NumericEditor<float>;
+using DoubleEditor                   = NumericEditor<double>;
 
 } // namespace TINKERUSD_NS

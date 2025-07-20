@@ -1,7 +1,7 @@
 # TinkerUsd
 TinkerUsd is an experimental project written in C++ for R&D purposes. This project is free and very much work in progress.
 
-![](docs/images/screenshot.png)
+![](docs/images/screenshot.gif)
 
 # Features
 - [Property Editor](source/ui/propertyEditor/README.md)

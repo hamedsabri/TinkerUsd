@@ -39,10 +39,7 @@ public:
     // update the camera's transform matrix
     void updateTransform();
 
-    // frame to stage bbox
-    void frameBoundingBox();
-
-    // Scales the distance of the UsdCamera from it's center
+    // scales the distance of the UsdCamera from it's center
     void adjustDistance(double scaleFactor);
 
     double aspectRatio() const;
@@ -57,8 +54,19 @@ public:
 
     double computePixelsToWorldFactor(int height);
 
+    void frameSelected(const GfBBox3d& bBox);
+
+    void reset();
+
 private:
-    GfCamera m_camera;
+    void initialize();
+
+    void frameBoundingBox();
+
+private:
+    GfCamera               m_camera;
+    PXR_NS::UsdStageRefPtr m_stage;
+    TfToken                m_upAxis;
 
     double m_fov;
     double m_distance;
@@ -70,7 +78,6 @@ private:
     double m_aspectRatio;
 
     GfBBox3d  m_bbox;
-    TfToken   m_upAxis;
     GfVec3d   m_center;
     GfRange3d m_range;
 

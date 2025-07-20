@@ -20,6 +20,8 @@ public:
     void setStage(const PXR_NS::UsdStageRefPtr& stage);
     QLineEdit* searchLineEdit() const { return m_searchLineEdit; }
 
+    void focusPrim(const PXR_NS::UsdPrim& prim);
+
 private slots:
     void onSelectionChanged(const QItemSelection& selected);
     void onSearchTextChanged(const QString& text);

@@ -6,6 +6,7 @@ target_sources(${TARGET_NAME}
         mainMenubar.cpp
         mainWindow.cpp
         viewportOpenGLWidget.cpp
+        undoManager.cpp
 )
 
 add_subdirectory(composition)

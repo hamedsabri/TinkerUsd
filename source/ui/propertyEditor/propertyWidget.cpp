@@ -55,11 +55,9 @@ void PropertyWidget::onSelectionChanged()
         return;
     }
 
-    m_treeView->getModel()->setUsdPrim(selectedPrim);
-    m_treeView->getModel()->loadUsdAttributes();
+    m_treeView->getModel()->loadUsdProperties();
     m_treeView->getModel()->loadVariantSets();
     m_treeView->expandAllGroups();
-
     m_treeView->reapplyPersistentEditors();
 }
 

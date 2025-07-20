@@ -11,21 +11,31 @@ namespace TINKERUSD_NS
 {
 
 UsdCamera::UsdCamera(PXR_NS::UsdStageRefPtr stage)
-    : m_fov(60.0)
-    , m_distance(100.0)
-    , m_nearClip(1.0)
-    , m_farClip(1000000.0)
-    , m_rotTheta(0)
-    , m_rotPhi(0)
-    , m_rotPsi(0)
-    , m_aspectRatio(1.0)
+    : m_stage(stage)
+    , m_upAxis(PXR_NS::UsdGeomGetStageUpAxis(m_stage))
 {
-    UsdGeomBBoxCache bboxCache(UsdTimeCode::Default(), UsdGeomImageable::GetOrderedPurposeTokens());
+    reset();
+}
 
-    m_bbox = bboxCache.ComputeWorldBound(stage->GetPseudoRoot());
-    m_upAxis = PXR_NS::UsdGeomGetStageUpAxis(stage);
-    m_center = m_bbox.ComputeCentroid();
-    m_range = m_bbox.ComputeAlignedRange();
+void UsdCamera::initialize()
+{
+    m_fov = 60.0;
+    m_distance = 100.0;
+    m_nearClip = 1.0;
+    m_farClip = 1000000.0;
+    m_rotTheta = 0;
+    m_rotPhi = 0;
+    m_rotPsi = 0;
+    m_aspectRatio = 1.0;
+
+    UsdGeomBBoxCache bboxCache(UsdTimeCode::Default(), UsdGeomImageable::GetOrderedPurposeTokens());
+	setBoundingBox(bboxCache.ComputeWorldBound(m_stage->GetPseudoRoot()));
+
+    m_camera.SetPerspectiveFromAspectRatioAndFieldOfView(m_aspectRatio, m_fov, GfCamera::FOVVertical);
+    m_camera.SetFocusDistance(m_distance);
+    m_camera.SetClippingRange(GfRange1f(m_nearClip, m_farClip));
+    CameraUtilConformWindowPolicy policy = CameraUtilConformWindowPolicy::CameraUtilFit;
+    CameraUtilConformWindow(&m_camera, policy, m_aspectRatio);
 
     frameBoundingBox();
 }
@@ -78,34 +88,27 @@ void UsdCamera::updateTransform()
     if (m_camera.GetProjection() == GfCamera::Perspective) {
         // reset projection
         m_camera.SetPerspectiveFromAspectRatioAndFieldOfView(m_aspectRatio, m_fov, GfCamera::FOVVertical);
-
         m_camera.SetFocusDistance(m_distance);
         m_camera.SetClippingRange(GfRange1f(m_nearClip, m_farClip));
-        CameraUtilConformWindowPolicy policy = CameraUtilConformWindowPolicy::CameraUtilFit;
-        CameraUtilConformWindow(&m_camera, policy, m_aspectRatio);
     }
+
 }
 
 void UsdCamera::frameBoundingBox()
 {
-    if (m_bbox.GetVolume() == 0)
-    {
-        return;
-    }
-
-    if (m_camera.GetProjection() == GfCamera::Perspective)
-    {
+    if (m_camera.GetProjection() == GfCamera::Perspective) {
         // calculate distance
         auto size = m_range.GetSize();
         auto maxsize = std::max(size[0], std::max(size[1], size[2]));
-        auto fovangle = m_camera.GetFieldOfView(GfCamera::FOVHorizontal);
+        auto fov = m_fov * 0.5;
+        if (m_fov == 0.0) {
+            m_fov = 0.5;
+        }
         auto lengthToFit = maxsize * 0.5;
-        m_distance = lengthToFit / std::atan(fovangle * PI / 180.0);
+        m_distance = lengthToFit / std::atan(fov * (PI / 180.0));
         if (m_distance < m_nearClip + maxsize * 0.5) {
             m_distance = m_nearClip + lengthToFit;
         }
-
-        updateTransform();
     }
 }
 
@@ -178,6 +181,18 @@ double UsdCamera::computePixelsToWorldFactor(int height)
     }
 
     return 0;
+}
+
+void UsdCamera::frameSelected(const GfBBox3d& bBox)
+{
+    setBoundingBox(bBox);
+    frameBoundingBox();
+}
+
+void UsdCamera::reset()
+{
+    initialize();
+    frameBoundingBox();
 }
 
 } // namespace TINKERUSD_NS

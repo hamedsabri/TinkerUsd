@@ -7,6 +7,7 @@
 #include <QHeaderView>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QShortcut>
 
 #include <pxr/usd/usd/modelAPI.h>
 #include <pxr/usd/usdGeom/imageable.h>
@@ -41,6 +42,13 @@ void OutlinerWidget::onCreateUI()
 
     mainLayout->addLayout(searchLayout);
     mainLayout->addWidget(m_treeView);
+
+    QShortcut* frameShortcut = new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F), this);
+    frameShortcut->setContext(Qt::ApplicationShortcut);
+
+    connect(frameShortcut, &QShortcut::activated, this, [this]() {
+        m_treeView->focusPrim(GlobalSelection::instance().prim());
+    });
 
     setLayout(mainLayout);
 }

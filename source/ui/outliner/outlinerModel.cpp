@@ -202,4 +202,29 @@ UsdPrim UsdOutlinerModel::primFromIndex(const QModelIndex& index) const
     return item ? item->prim() : UsdPrim();
 }
 
+QModelIndex UsdOutlinerModel::indexFromPrim(const UsdPrim& targetPrim) const
+{
+    std::function<QModelIndex(UsdOutlinerItem::Ptr)> findIndex;
+    findIndex = [&](UsdOutlinerItem::Ptr item) -> QModelIndex {
+        if (!item) {
+            return {};
+        }
+
+        if (item->prim() == targetPrim) {
+            return createIndex(item->row(), 0, item.get());
+        }
+
+        item->fetchChildrenIfNeeded();
+        for (int i = 0; i < item->childCount(); ++i) {
+            auto index = findIndex(item->child(i));
+            if (index.isValid()) {
+                return index;
+            }
+        }
+        return {};
+    };
+
+    return findIndex(m_rootItem);
+}
+
 } // namespace TINKERUSD_NS

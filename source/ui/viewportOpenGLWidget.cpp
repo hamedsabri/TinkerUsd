@@ -2,6 +2,8 @@
 #include "core/globalSelection.h"
 #include "core/usdDocument.h"
 
+#include <pxr/usd/usdGeom/metrics.h>
+
 #include <QMouseEvent>
 #include <QSurfaceFormat>
 #include <QWheelEvent>
@@ -84,6 +86,9 @@ void ViewportOpenGLWidget::initialize()
     m_usdCamera = std::make_unique<UsdCamera>(m_stage);
     m_renderEngineGL = std::make_unique<UsdRenderEngineGL>();
     m_renderEngineGL->initialize( m_stage );
+
+    m_grid = std::make_unique<Grid>();
+    m_grid->initialize();
 }
 
 void ViewportOpenGLWidget::onStageOpened(const QString& filePath)
@@ -91,6 +96,21 @@ void ViewportOpenGLWidget::onStageOpened(const QString& filePath)
     m_stage = m_usdDocument->getCurrentStage();
 
     initialize();
+
+    update();
+}
+
+void ViewportOpenGLWidget::frameSelected()
+{
+    m_usdCamera->frameSelected( globalSelectionBbox( m_stage ) );
+
+    update();
+}
+
+void ViewportOpenGLWidget::reset()
+{
+    m_usdCamera->reset();
+
     update();
 }
 
@@ -107,6 +127,12 @@ void ViewportOpenGLWidget::resizeGL(int w, int h)
 QString ViewportOpenGLWidget::rendererDisplayName() const
 {
     return QString::fromStdString(m_renderEngineGL->rendererDisplayName());
+}
+
+QString ViewportOpenGLWidget::upAxisDisplayName() const
+{
+    TfToken stageUpAxis = PXR_NS::UsdGeomGetStageUpAxis(m_stage);
+    return QString::fromStdString(stageUpAxis.GetString());
 }
 
 void ViewportOpenGLWidget::setShadingMode(ViewportOpenGLWidget::ShadingMode mode)
@@ -141,7 +167,9 @@ void ViewportOpenGLWidget::paintGL()
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_MULTISAMPLE);
     glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LESS);
 
     m_renderEngineGL->params().cullStyle
         = UsdImagingGLCullStyle::CULL_STYLE_BACK_UNLESS_DOUBLE_SIDED;
@@ -180,6 +208,9 @@ void ViewportOpenGLWidget::paintGL()
     m_renderEngineGL->params().complexity = 1.0;
 
     m_renderEngineGL->render(m_stage, m_usdCamera.get(), m_width, m_height);
+
+    TfToken stageUpAxis = PXR_NS::UsdGeomGetStageUpAxis(m_stage);
+    m_grid->draw(m_usdCamera.get(), stageUpAxis);
 
     m_drawTarget->unbind();
     m_drawTarget->draw();

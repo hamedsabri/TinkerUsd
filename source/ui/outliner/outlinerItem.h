@@ -30,9 +30,10 @@ public:
     Ptr parentItem();
     PXR_NS::UsdPrim prim() const;
 
+    void fetchChildrenIfNeeded();
+
 private:
     UsdOutlinerItem(const PXR_NS::UsdPrim& prim, Ptr parent);
-    void fetchChildrenIfNeeded();
 
 private:
     PXR_NS::UsdPrim     m_prim;

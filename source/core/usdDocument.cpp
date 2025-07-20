@@ -1,4 +1,6 @@
 #include "UsdDocument.h"
+#include "undo/usdUndoManager.h"
+#include "ui/undoManager.h"
 
 #include <QMessageBox>
 
@@ -16,6 +18,11 @@ PXR_NS::UsdStageRefPtr UsdDocument::createNewStageInMemory()
 
     if (m_stage) {
         emit stageOpened("untitled");
+
+        // clear undo stack
+        UndoManager::undoStack()->clear();
+
+        UsdUndoManager::instance().trackLayerStates(m_stage->GetEditTarget().GetLayer());
     }
     else {
         // TODO: Log.Error
@@ -31,6 +38,11 @@ PXR_NS::UsdStageRefPtr UsdDocument::openStage(const QString& path)
 
     if (m_stage) {
         emit stageOpened(path);
+
+        // clear undo stack
+        UndoManager::undoStack()->clear();
+
+        UsdUndoManager::instance().trackLayerStates(m_stage->GetEditTarget().GetLayer());
     }
     else {
         // TODO: Log.Error

@@ -29,6 +29,8 @@ public:
 
     PXR_NS::UsdPrim primFromIndex(const QModelIndex& index) const;
 
+    QModelIndex indexFromPrim(const PXR_NS::UsdPrim& prim) const;
+
 private:
     PXR_NS::UsdStageRefPtr  m_stage;
     UsdOutlinerItem::Ptr m_rootItem;

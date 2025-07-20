@@ -17,32 +17,11 @@ UsdAttributeWrapper::Ptr UsdAttributeWrapper::create(const PXR_NS::UsdAttribute&
 
 bool UsdAttributeWrapper::get(PXR_NS::VtValue& value, PXR_NS::UsdTimeCode time) const
 {
-    if (hasValue())
-    {
-        return m_usdAttr.Get(&value, time);
-    }
-    else
-    {
-        return false;
-    }
+    return m_usdAttr.Get(&value, time);
 }
 
 bool UsdAttributeWrapper::set(const PXR_NS::VtValue& value, PXR_NS::UsdTimeCode time)
 {
-    if (!isValid())
-    {
-        PXR_NS::VtValue currentValue;
-        get(currentValue, time);
-        if (currentValue == value)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
     return m_usdAttr.Set(value, time);
 }
 

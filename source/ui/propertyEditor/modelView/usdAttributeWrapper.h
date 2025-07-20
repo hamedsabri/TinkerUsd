@@ -1,8 +1,10 @@
 #pragma once
 
-#include <QString>
-#include <memory>
 #include <pxr/usd/usd/attribute.h>
+
+#include <QtCore/QString>
+
+#include <memory>
 
 namespace TINKERUSD_NS
 {
@@ -11,7 +13,7 @@ namespace TINKERUSD_NS
  * @class UsdAttributeWrapper
  * @brief A wrapper class that provides convenient access and manipulation of USD attributes.
  */
-class UsdAttributeWrapper
+class UsdAttributeWrapper final
 {
 public:
     using Ptr = std::unique_ptr<UsdAttributeWrapper>;

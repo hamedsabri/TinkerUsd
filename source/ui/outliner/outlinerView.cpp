@@ -5,6 +5,7 @@
 
 #include <QItemSelectionModel>
 #include <QLineEdit>
+#include <QKeyEvent>
 
 namespace TINKERUSD_NS
 {
@@ -73,6 +74,23 @@ void UsdOutlinerView::onSearchTextChanged(const QString& text)
     if (!text.isEmpty()) {
         expandAll();
     }
+}
+
+void UsdOutlinerView::focusPrim(const UsdPrim& prim)
+{
+    QModelIndex sourceIndex = m_model->indexFromPrim(prim);
+    if (!sourceIndex.isValid()) {
+        return;
+    }
+
+    QModelIndex proxyIndex = m_proxyModel->mapFromSource(sourceIndex);
+    if (!proxyIndex.isValid()) {
+        return;
+    }
+
+    expand(proxyIndex.parent());
+    scrollTo(proxyIndex, QAbstractItemView::PositionAtCenter);
+    setCurrentIndex(proxyIndex);
 }
 
 } // namespace TINKERUSD_NS

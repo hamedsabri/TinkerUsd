@@ -13,6 +13,7 @@ target_sources(${PROJECT_NAME}
 )
 
 add_subdirectory(common)
+add_subdirectory(commands)
 add_subdirectory(customWidgets)
 add_subdirectory(modelView)
 add_subdirectory(valueEditors)

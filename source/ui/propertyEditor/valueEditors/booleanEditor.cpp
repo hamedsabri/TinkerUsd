@@ -10,20 +10,29 @@ namespace TINKERUSD_NS
 
 PropertyCheckBoxWidget::PropertyCheckBoxWidget(QWidget* parent)
     : QWidget(parent)
-    , m_checkBox(new QCheckBox(this))
+    , m_checkBox(new QCheckBox(parent))
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_checkBox);
+    setLayout(layout);
 
-    connect(m_checkBox, &QCheckBox::toggled, [this](bool) { emit commitData(); });
+    connect(m_checkBox, &QCheckBox::toggled, [this](bool){
+        Q_EMIT commitData();
+    });
 
     setFocusProxy(m_checkBox);
 }
 
-bool PropertyCheckBoxWidget::isChecked() const { return m_checkBox->isChecked(); }
+bool PropertyCheckBoxWidget::isChecked() const
+{
+    return m_checkBox->isChecked();
+}
 
-void PropertyCheckBoxWidget::setChecked(bool c) { m_checkBox->setChecked(c); }
+void PropertyCheckBoxWidget::setChecked(bool c)
+{ 
+    m_checkBox->setChecked(c);
+}
 
 BooleanEditor::BooleanEditor(const QString& name, bool value, const QString& tooltip)
     : AbstractPropertyEditor(name, value, tooltip)
@@ -32,56 +41,46 @@ BooleanEditor::BooleanEditor(const QString& name, bool value, const QString& too
 
 QWidget* BooleanEditor::createEditor(QWidget* parent) const
 {
-    PropertyCheckBoxWidget* editor = new PropertyCheckBoxWidget(parent);
-    editor->setToolTip(tooltip());
-    editor->setChecked(currentValue().toBool());
-    return editor;
+    PropertyCheckBoxWidget* propertyCheckBoxWidget = new PropertyCheckBoxWidget(parent);
+    propertyCheckBoxWidget->setToolTip(tooltip());
+    propertyCheckBoxWidget->setChecked(currentValue().toBool());
+    return propertyCheckBoxWidget;
+}
+
+PXR_NS::VtValue BooleanEditor::toVtValue(const QVariant& value) const
+{
+    return PXR_NS::VtValue(value.toBool());
+}
+
+QVariant BooleanEditor::fromVtValue(const PXR_NS::VtValue& value) const
+{
+    if (value.IsHolding<bool>()) {
+        return QVariant(value.Get<bool>());
+    }
+    return QVariant();
 }
 
 void BooleanEditor::setEditorData(QWidget* editor, const QVariant& data) const
 {
-    PropertyCheckBoxWidget* checkBox = qobject_cast<PropertyCheckBoxWidget*>(editor);
-    if (checkBox)
-    {
-        checkBox->blockSignals(true);
-        checkBox->setChecked(data.toBool());
-        checkBox->blockSignals(false);
+    PropertyCheckBoxWidget* propertyCheckBoxWidget = qobject_cast<PropertyCheckBoxWidget*>(editor);
+    if (propertyCheckBoxWidget) {
+        propertyCheckBoxWidget->blockSignals(true);
+        propertyCheckBoxWidget->setChecked(data.toBool());
+        propertyCheckBoxWidget->blockSignals(false);
     }
 }
 
 QVariant BooleanEditor::editorData(QWidget* editor) const
 {
-    PropertyCheckBoxWidget* checkBox = qobject_cast<PropertyCheckBoxWidget*>(editor);
-    if (checkBox)
-    {
-        return checkBox->isChecked();
+    PropertyCheckBoxWidget* propertyCheckBoxWidget = qobject_cast<PropertyCheckBoxWidget*>(editor);
+    if (propertyCheckBoxWidget) {
+        return propertyCheckBoxWidget->isChecked();
     }
     return QVariant();
 }
 
-bool BooleanEditor::paint(
-    QPainter*                   painter,
-    const QStyleOptionViewItem& option,
-    const QVariant&             value) const
+bool BooleanEditor::paint(QPainter* painter, const QStyleOptionViewItem& option, const QVariant& value) const
 {
-    if (option.state & QStyle::State_Selected)
-    {
-        painter->fillRect(option.rect, option.palette.highlight());
-    }
-
-    QStyleOptionButton checkBoxOption;
-    checkBoxOption.state |= QStyle::State_Enabled;
-    if (value.toBool())
-    {
-        checkBoxOption.state |= QStyle::State_On;
-    }
-    else
-    {
-        checkBoxOption.state |= QStyle::State_Off;
-    }
-    checkBoxOption.rect = option.rect;
-
-    QApplication::style()->drawControl(QStyle::CE_CheckBox, &checkBoxOption, painter);
     return true;
 }
 

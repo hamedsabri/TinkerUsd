@@ -1,17 +1,16 @@
 #include "vector3dEditor.h"
 
-#include <QHBoxLayout>
-#include <QLabel>
+#include <QtWidgets/QLabel>
 
 namespace TINKERUSD_NS
 {
 
-template <typename T>
-Vector3DEditorWidget<T>::Vector3DEditorWidget(QWidget* parent)
+template<typename T>
+Vector3DEditorWidget<T>::Vector3DEditorWidget(QWidget *parent)
     : AbstractVector3DWidget(parent)
-    , m_xLineEdit(new ValueEntryLineEdit(this))
-    , m_yLineEdit(new ValueEntryLineEdit(this))
-    , m_zLineEdit(new ValueEntryLineEdit(this))
+    , m_xLineEdit(new DoubleValueLineEdit(this))
+    , m_yLineEdit(new DoubleValueLineEdit(this))
+    , m_zLineEdit(new DoubleValueLineEdit(this))
 {
     m_xLineEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     m_yLineEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -21,7 +20,7 @@ Vector3DEditorWidget<T>::Vector3DEditorWidget(QWidget* parent)
     m_yLineEdit->setFixedHeight(20);
     m_zLineEdit->setFixedHeight(20);
 
-    QHBoxLayout* layout = new QHBoxLayout(this);
+    QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(5);
 
@@ -31,40 +30,22 @@ Vector3DEditorWidget<T>::Vector3DEditorWidget(QWidget* parent)
 
     setLayout(layout);
 
-    connect(
-        m_xLineEdit,
-        &ValueEntryLineEdit::valueChanged,
-        this,
-        &AbstractVector3DWidget::onValueEntryChanged);
-    connect(
-        m_yLineEdit,
-        &ValueEntryLineEdit::valueChanged,
-        this,
-        &AbstractVector3DWidget::onValueEntryChanged);
-    connect(
-        m_zLineEdit,
-        &ValueEntryLineEdit::valueChanged,
-        this,
-        &AbstractVector3DWidget::onValueEntryChanged);
+    connect(m_xLineEdit, &DoubleValueLineEdit::valueChanged, this, &AbstractVector3DWidget::onValueEntryChanged);
+    connect(m_yLineEdit, &DoubleValueLineEdit::valueChanged, this, &AbstractVector3DWidget::onValueEntryChanged);
+    connect(m_zLineEdit, &DoubleValueLineEdit::valueChanged, this, &AbstractVector3DWidget::onValueEntryChanged);
 }
 
-template <typename T>
-void Vector3DEditorWidget<T>::addComponentToLayout(
-    QHBoxLayout*        layout,
-    const QString&      labelText,
-    ValueEntryLineEdit* lineEdit,
-    const QColor&       backgroundColor)
+template<typename T>
+void Vector3DEditorWidget<T>::addComponentToLayout(QHBoxLayout* layout, const QString& labelText, DoubleValueLineEdit* lineEdit, const QColor& backgroundColor)
 {
     QLabel* label = new QLabel(labelText, this);
     label->setFixedHeight(m_xLineEdit->height());
     label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     label->setAlignment(Qt::AlignCenter);
-    label->setStyleSheet(
-        QString("background-color: %1; color: white; padding: 3px; border-top-left-radius: 3px; "
-                "border-bottom-left-radius: 3px;")
-            .arg(backgroundColor.name()));
+    label->setStyleSheet(QString("background-color: %1; color: white; padding: 1px; border-top-left-radius: 1px; border-bottom-left-radius: 1px;")
+        .arg(backgroundColor.name()));
 
-    QWidget*     container = new QWidget(this);
+    QWidget* container = new QWidget(this);
     QHBoxLayout* containerLayout = new QHBoxLayout(container);
     containerLayout->setContentsMargins(0, 0, 0, 0);
     containerLayout->setSpacing(0);
@@ -75,36 +56,37 @@ void Vector3DEditorWidget<T>::addComponentToLayout(
     layout->addWidget(container);
 }
 
-template <typename T> QVector3D Vector3DEditorWidget<T>::getValue() const
+template<typename T>
+QVector3D Vector3DEditorWidget<T>::getValue() const
 {
     return QVector3D(m_xLineEdit->value(), m_yLineEdit->value(), m_zLineEdit->value());
 }
 
-template <typename T> void Vector3DEditorWidget<T>::setValue(const QVector3D& vec)
+template<typename T>
+void Vector3DEditorWidget<T>::setValue(const QVector3D &vec)
 {
     m_xLineEdit->setValue(vec.x());
     m_yLineEdit->setValue(vec.y());
     m_zLineEdit->setValue(vec.z());
 }
 
-template <typename T> void Vector3DEditorWidget<T>::setRange(const QPair<T, T>& range)
+template<typename T>
+void Vector3DEditorWidget<T>::setRange(const QPair<T, T>& range)
 {
     m_xLineEdit->setRange(range.first, range.second);
     m_yLineEdit->setRange(range.first, range.second);
     m_zLineEdit->setRange(range.first, range.second);
 }
 
-template <typename T>
-Vector3DEditor<T>::Vector3DEditor(
-    const QString&         name,
-    const Vector3dData<T>& data,
-    const QString&         tooltip)
+template<typename T>
+Vector3DEditor<T>::Vector3DEditor(const QString &name, const Vector3dData<T>& data, const QString &tooltip)
     : AbstractPropertyEditor(name, QVariant::fromValue(data.m_defaultValue), tooltip)
     , m_range(data.m_range)
 {
 }
 
-template <typename T> QWidget* Vector3DEditor<T>::createEditor(QWidget* parent) const
+template<typename T>
+QWidget* Vector3DEditor<T>::createEditor(QWidget* parent) const
 {
     Vector3DEditorWidget<T>* widgetVec3D = new Vector3DEditorWidget<T>(parent);
     widgetVec3D->setValue(currentValue().value<QVector3D>());
@@ -113,33 +95,27 @@ template <typename T> QWidget* Vector3DEditor<T>::createEditor(QWidget* parent) 
     return widgetVec3D;
 }
 
-template <typename T> PXR_NS::VtValue Vector3DEditor<T>::toVtValue(const QVariant& value) const
+template<typename T>
+PXR_NS::VtValue Vector3DEditor<T>::toVtValue(const QVariant& value) const
 {
     QVector3D vec = value.value<QVector3D>();
-    if constexpr (std::is_same_v<T, float>)
-    {
+    if constexpr (std::is_same_v<T, float>) {
         return PXR_NS::VtValue(PXR_NS::GfVec3f(vec.x(), vec.y(), vec.z()));
-    }
-    else
-    {
+    } else {
         return PXR_NS::VtValue(PXR_NS::GfVec3d(vec.x(), vec.y(), vec.z()));
     }
 }
 
-template <typename T> QVariant Vector3DEditor<T>::fromVtValue(const PXR_NS::VtValue& value) const
+template<typename T>
+QVariant Vector3DEditor<T>::fromVtValue(const PXR_NS::VtValue& value) const
 {
-    if constexpr (std::is_same_v<T, float>)
-    {
-        if (value.IsHolding<PXR_NS::GfVec3f>())
-        {
+    if constexpr (std::is_same_v<T, float>) {
+        if (value.IsHolding<PXR_NS::GfVec3f>()) {
             PXR_NS::GfVec3f vec = value.Get<PXR_NS::GfVec3f>();
             return QVariant(QVector3D(vec[0], vec[1], vec[2]));
         }
-    }
-    else
-    {
-        if (value.IsHolding<PXR_NS::GfVec3d>())
-        {
+    } else {
+        if (value.IsHolding<PXR_NS::GfVec3d>()) {
             PXR_NS::GfVec3d vec = value.Get<PXR_NS::GfVec3d>();
             return QVariant(QVector3D(vec[0], vec[1], vec[2]));
         }
@@ -147,27 +123,26 @@ template <typename T> QVariant Vector3DEditor<T>::fromVtValue(const PXR_NS::VtVa
     return QVariant();
 }
 
-template <typename T>
+template<typename T>
 void Vector3DEditor<T>::setEditorData(QWidget* editor, const QVariant& data) const
 {
-    AbstractVector3DWidget* vectorEditor = dynamic_cast<AbstractVector3DWidget*>(editor);
-    if (vectorEditor)
-    {
-        vectorEditor->setValue(data.value<QVector3D>());
+    AbstractVector3DWidget* abstractVector3DWidget = dynamic_cast<AbstractVector3DWidget*>(editor);
+    if (abstractVector3DWidget) {
+        abstractVector3DWidget->setValue(data.value<QVector3D>());
     }
 }
 
-template <typename T> QVariant Vector3DEditor<T>::editorData(QWidget* editor) const
+template<typename T>
+QVariant Vector3DEditor<T>::editorData(QWidget* editor) const
 {
-    AbstractVector3DWidget* vectorEditor = dynamic_cast<AbstractVector3DWidget*>(editor);
-    if (vectorEditor)
-    {
-        return vectorEditor->getValue();
+    AbstractVector3DWidget* abstractVector3DWidget = dynamic_cast<AbstractVector3DWidget*>(editor);
+    if (abstractVector3DWidget) {
+        return abstractVector3DWidget->getValue();
     }
     return QVariant();
 }
 
-// explicit instantiation
+// explicit instantiation 
 template class Vector3DEditorWidget<float>;
 template class Vector3DEditorWidget<double>;
 

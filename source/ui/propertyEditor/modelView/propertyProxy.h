@@ -7,16 +7,23 @@
 namespace TINKERUSD_NS
 {
 
+/*
+ * @class PropertyProxy
+ * @brief This class provides support for sorting and filtering 
+ *        data passed between another model and a view.
+ */
 class PropertyProxy : public QSortFilterProxyModel
 {
     Q_OBJECT
 public:
     PropertyProxy(QObject* parent = nullptr);
 
+    virtual ~PropertyProxy() = default;
+
 public slots:
     void setSpecialFilter(SpecialFilterKeyword keyword);
 
-protected:
+private:
     bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
 
 private:

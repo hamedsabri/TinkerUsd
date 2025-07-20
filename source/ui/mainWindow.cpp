@@ -162,29 +162,40 @@ MainWindow::MainWindow(QWidget* parent)
         GlobalSelection::instance().clearSelection();
     });
 
+    connect(mainMenuBar,&MainMenuBar::camFrameSelectSignal,viewportGLWidget,&ViewportOpenGLWidget::frameSelected);
+
+    connect(mainMenuBar,&MainMenuBar::camResetSignal,viewportGLWidget,&ViewportOpenGLWidget::reset);
+
     auto rendererTypeLabel = new QLabel();
+    auto stageUpAxisLabel = new QLabel(QString("Up Axis: %1 ").arg(viewportGLWidget->upAxisDisplayName()));
+
+    statusBar->addWidget(rendererTypeLabel);
+    statusBar->addWidget(stageUpAxisLabel);
+
     connect(
         viewportGLWidget,
         &ViewportOpenGLWidget::rendererAvailable,
         this,
         [this, statusBar, viewportGLWidget, rendererTypeLabel, aovComboBox]() {
+            
             rendererTypeLabel->setText(
-                QString("Render: %1").arg(viewportGLWidget->rendererDisplayName()));
-            statusBar->addPermanentWidget(rendererTypeLabel, 1);
+                QString("Render: %1 ").arg(viewportGLWidget->rendererDisplayName()));
 
             // aov
             aovComboBox->clear();
             const auto  aovs = viewportGLWidget->getRendererAovs();
             QStringList qAovs;
-            for (const auto& aov : aovs)
-            {
+            for (const auto& aov : aovs) {
                 qAovs.append(QString::fromStdString(aov));
             }
             aovComboBox->addItems(qAovs);
-            if (!aovs.empty())
-            {
+            if (!aovs.empty()) {
                 aovComboBox->setCurrentText(QString::fromStdString(aovs[0]));
             }
+        });
+
+        connect(usdDocument, &UsdDocument::stageOpened, this, [this, viewportGLWidget, stageUpAxisLabel]() {
+            stageUpAxisLabel->setText(QString("Up Axis: %1 ").arg(viewportGLWidget->upAxisDisplayName()));
         });
 }
 
