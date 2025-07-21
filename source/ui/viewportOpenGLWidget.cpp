@@ -1,12 +1,12 @@
 #include "viewportOpenGLWidget.h"
+
 #include "core/globalSelection.h"
 #include "core/usdDocument.h"
-
-#include <pxr/usd/usdGeom/metrics.h>
 
 #include <QMouseEvent>
 #include <QSurfaceFormat>
 #include <QWheelEvent>
+#include <pxr/usd/usdGeom/metrics.h>
 
 #define SAMPLE_AMOUNT 8
 
@@ -39,7 +39,8 @@ ViewportOpenGLWidget::ViewportOpenGLWidget(UsdDocument* document, QWidget* paren
 
 ViewportOpenGLWidget::~ViewportOpenGLWidget()
 {
-    if (m_ObjectsChangedKey.IsValid()) {
+    if (m_ObjectsChangedKey.IsValid())
+    {
         TfNotice::Revoke(m_ObjectsChangedKey);
     }
 }
@@ -48,7 +49,7 @@ void ViewportOpenGLWidget::onSelectionChanged()
 {
     m_renderEngineGL->addSelectionHighlighting();
 
-    m_renderEngineGL->addBboxRenderParams( globalSelectionBbox( m_stage ) );
+    m_renderEngineGL->addBboxRenderParams(globalSelectionBbox(m_stage));
 
     update();
 }
@@ -58,9 +59,10 @@ void ViewportOpenGLWidget::onUsdObjectChanged(const UsdNotice::ObjectsChanged& n
     const auto& resyncedPaths = notice.GetResyncedPaths();
     const auto& changedPaths = notice.GetChangedInfoOnlyPaths();
 
-    if (!resyncedPaths.empty() || !changedPaths.empty()) {
+    if (!resyncedPaths.empty() || !changedPaths.empty())
+    {
 
-        m_renderEngineGL->addBboxRenderParams( globalSelectionBbox( m_stage ) );
+        m_renderEngineGL->addBboxRenderParams(globalSelectionBbox(m_stage));
 
         update();
     }
@@ -79,13 +81,14 @@ void ViewportOpenGLWidget::initializeGL()
 
 void ViewportOpenGLWidget::initialize()
 {
-    if (!m_stage) {
+    if (!m_stage)
+    {
         return;
     }
 
     m_usdCamera = std::make_unique<UsdCamera>(m_stage);
     m_renderEngineGL = std::make_unique<UsdRenderEngineGL>();
-    m_renderEngineGL->initialize( m_stage );
+    m_renderEngineGL->initialize(m_stage);
 
     m_grid = std::make_unique<Grid>();
     m_grid->initialize();
@@ -102,7 +105,7 @@ void ViewportOpenGLWidget::onStageOpened(const QString& filePath)
 
 void ViewportOpenGLWidget::frameSelected()
 {
-    m_usdCamera->frameSelected( globalSelectionBbox( m_stage ) );
+    m_usdCamera->frameSelected(globalSelectionBbox(m_stage));
 
     update();
 }
@@ -141,10 +144,7 @@ void ViewportOpenGLWidget::setShadingMode(ViewportOpenGLWidget::ShadingMode mode
     update();
 }
 
-ViewportOpenGLWidget::ShadingMode ViewportOpenGLWidget::shadingMode() const
-{
-    return m_shadingMode;
-}
+ViewportOpenGLWidget::ShadingMode ViewportOpenGLWidget::shadingMode() const { return m_shadingMode; }
 
 std::vector<std::string> ViewportOpenGLWidget::getRendererAovs() const
 {
@@ -171,14 +171,11 @@ void ViewportOpenGLWidget::paintGL()
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
 
-    m_renderEngineGL->params().cullStyle
-        = UsdImagingGLCullStyle::CULL_STYLE_BACK_UNLESS_DOUBLE_SIDED;
+    m_renderEngineGL->params().cullStyle = UsdImagingGLCullStyle::CULL_STYLE_BACK_UNLESS_DOUBLE_SIDED;
 
     switch (m_shadingMode)
     {
-    case ShadingMode::POINTS:
-        m_renderEngineGL->params().drawMode = UsdImagingGLDrawMode::DRAW_POINTS;
-        break;
+    case ShadingMode::POINTS: m_renderEngineGL->params().drawMode = UsdImagingGLDrawMode::DRAW_POINTS; break;
     case ShadingMode::WIREFRAME:
         m_renderEngineGL->params().drawMode = UsdImagingGLDrawMode::DRAW_WIREFRAME;
         break;
@@ -191,8 +188,7 @@ void ViewportOpenGLWidget::paintGL()
     case ShadingMode::SHADEDSMOOTH:
     default: m_renderEngineGL->params().drawMode = UsdImagingGLDrawMode::DRAW_SHADED_SMOOTH; break;
     }
-    m_renderEngineGL->params().cullStyle
-        = UsdImagingGLCullStyle::CULL_STYLE_BACK_UNLESS_DOUBLE_SIDED;
+    m_renderEngineGL->params().cullStyle = UsdImagingGLCullStyle::CULL_STYLE_BACK_UNLESS_DOUBLE_SIDED;
     m_renderEngineGL->params().clearColor = GfVec4f(0.2f, 0.2f, 0.2f, 1.0f);
     m_renderEngineGL->params().forceRefresh = false;
     m_renderEngineGL->params().enableLighting = true; // false to turn off camera light
@@ -228,29 +224,34 @@ void ViewportOpenGLWidget::mousePressEvent(QMouseEvent* event)
 {
     m_lastMousePosition = event->pos() * devicePixelRatio();
 
-    if (event->modifiers() & (Qt::AltModifier | Qt::MetaModifier)) {
-        if (event->button() == Qt::LeftButton) {
+    if (event->modifiers() & (Qt::AltModifier | Qt::MetaModifier))
+    {
+        if (event->button() == Qt::LeftButton)
+        {
             m_usdCamera->setDragMode(UsdCamera::DragMode::DOLLY);
         }
-        else if (event->button() == Qt::RightButton) {
+        else if (event->button() == Qt::RightButton)
+        {
             m_usdCamera->setDragMode(UsdCamera::DragMode::ZOOM);
         }
-        else if (event->button() == Qt::MiddleButton) {
+        else if (event->button() == Qt::MiddleButton)
+        {
             m_usdCamera->setDragMode(UsdCamera::DragMode::PAN);
         }
-    } else {
+    }
+    else
+    {
 
         // NOTE: Explicitly set Depth Mask to True
         // OtherWise TestIntersection fails to pick
         glDepthMask(GL_TRUE);
 
         // normalize position and pick size by the viewport size
-        auto pos = pxr::GfVec2d(m_lastMousePosition.x() / m_width, 
-                                m_lastMousePosition.y() / m_height);
+        auto pos = pxr::GfVec2d(m_lastMousePosition.x() / m_width, m_lastMousePosition.y() / m_height);
 
         pos[0] = (pos[0] * 2.0 - 1.0);
         pos[1] = -1.0 * (pos[1] * 2.0 - 1.0);
-        
+
         auto size = pxr::GfVec2d(1.0f / m_width, 1.0f / m_height);
         auto cameraFrustum = m_usdCamera->getCamera().GetFrustum();
         auto pickFrustum = cameraFrustum.ComputeNarrowedFrustum(pos, size);
@@ -259,18 +260,22 @@ void ViewportOpenGLWidget::mousePressEvent(QMouseEvent* event)
         pxr::GfVec3d outHitPoint;
         pxr::SdfPath outHitInstancerPath;
         pxr::SdfPath outHitPrimPath;
-        auto hit = m_renderEngineGL->getUsdImagingGLEngine()->TestIntersection(pickFrustum.ComputeViewMatrix(), 
-                                                                               pickFrustum.ComputeProjectionMatrix(),
-                                                                               m_stage->GetPseudoRoot(),
-                                                                               m_renderEngineGL->params(),
-                                                                               &outHitPoint, 
-                                                                               &outHitNormal,
-                                                                               &outHitPrimPath, 
-                                                                               &outHitInstancerPath);
-        if ( hit ) {
+        auto         hit = m_renderEngineGL->getUsdImagingGLEngine()->TestIntersection(
+            pickFrustum.ComputeViewMatrix(),
+            pickFrustum.ComputeProjectionMatrix(),
+            m_stage->GetPseudoRoot(),
+            m_renderEngineGL->params(),
+            &outHitPoint,
+            &outHitNormal,
+            &outHitPrimPath,
+            &outHitInstancerPath);
+        if (hit)
+        {
             auto hitPrim = m_stage->GetPrimAtPath(outHitPrimPath);
             GlobalSelection::instance().setPrim(hitPrim);
-        } else {
+        }
+        else
+        {
             GlobalSelection::instance().clearSelection();
         }
     }
@@ -281,18 +286,22 @@ void ViewportOpenGLWidget::mouseMoveEvent(QMouseEvent* event)
     QPoint currentMousePosition = event->pos() * devicePixelRatio();
 
     QPoint delta = currentMousePosition - m_lastMousePosition;
-    if (delta.x() == 0 && delta.y() == 0) {
+    if (delta.x() == 0 && delta.y() == 0)
+    {
         return;
     }
 
-    if (m_usdCamera->getDragMode() == UsdCamera::DragMode::DOLLY) {
+    if (m_usdCamera->getDragMode() == UsdCamera::DragMode::DOLLY)
+    {
         m_usdCamera->dolly(0.25 * delta.x(), 0.25 * delta.y());
     }
-    else if (m_usdCamera->getDragMode() == UsdCamera::DragMode::PAN) {
+    else if (m_usdCamera->getDragMode() == UsdCamera::DragMode::PAN)
+    {
         auto pixelsToWorld = m_usdCamera->computePixelsToWorldFactor(m_height);
         m_usdCamera->pan(-delta.x() * pixelsToWorld, delta.y() * pixelsToWorld);
     }
-    else if (m_usdCamera->getDragMode() == UsdCamera::DragMode::ZOOM) {
+    else if (m_usdCamera->getDragMode() == UsdCamera::DragMode::ZOOM)
+    {
         auto zoomDelta = -.002 * (delta.x() + delta.y());
         m_usdCamera->zoom(zoomDelta);
     }

@@ -9,7 +9,7 @@ namespace TINKERUSD_NS
 
 /**
  * @class PropertyCheckBoxWidget
- * @brief A custom widget that contains a QCheckBox. It provides a slot to set 
+ * @brief A custom widget that contains a QCheckBox. It provides a slot to set
  * the checked state and emits a commitData signal when the checked state is changed.
  */
 class PropertyCheckBoxWidget : public QWidget
@@ -40,9 +40,7 @@ private:
 class BooleanEditor : public AbstractPropertyEditor
 {
 public:
-    BooleanEditor(const QString& name, 
-                  bool value, 
-                  const QString& tooltip = QString());
+    BooleanEditor(const QString& name, bool value, const QString& tooltip = QString());
 
     virtual ~BooleanEditor() = default;
 

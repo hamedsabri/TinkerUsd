@@ -7,13 +7,20 @@
 namespace TINKERUSD_NS
 {
 
-struct StringData 
+struct StringData
 {
     QString m_value;
-    bool m_editable;
+    bool    m_editable;
 
-    StringData() : m_editable(false) {}
-    StringData(const QString& value, bool editable) : m_value(value), m_editable(editable) {}
+    StringData()
+        : m_editable(false)
+    {
+    }
+    StringData(const QString& value, bool editable)
+        : m_value(value)
+        , m_editable(editable)
+    {
+    }
 };
 Q_DECLARE_METATYPE(StringData)
 
@@ -21,7 +28,7 @@ Q_DECLARE_METATYPE(StringData)
  * @class PropertyStringWidget
  * @brief A custom widget for editing string properties.
  *
- * This widget contains a QLineEdit for displaying and editing string values. 
+ * This widget contains a QLineEdit for displaying and editing string values.
  * It emits a commitData signal when the editing is finished.
  */
 class PropertyStringWidget : public QWidget
@@ -52,15 +59,13 @@ private:
  * @class StringEditor
  * @brief A property editor for string values.
  *
- * This class provides an interface for creating and managing a string property editor. 
+ * This class provides an interface for creating and managing a string property editor.
  * The actual editing is done via PropertyStringWidget.
  */
 class StringEditor : public AbstractPropertyEditor
 {
 public:
-    StringEditor(const QString& name, 
-                 const StringData& value, 
-                 const QString &tooltip = QString());
+    StringEditor(const QString& name, const StringData& value, const QString& tooltip = QString());
 
     virtual ~StringEditor() = default;
 

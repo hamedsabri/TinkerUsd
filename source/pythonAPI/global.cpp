@@ -5,9 +5,6 @@
 namespace TINKERUSD_NS
 {
 
-PXR_NS::UsdStageRefPtr stage() 
-{ 
-    return selectedPrim().GetStage(); 
-}
+PXR_NS::UsdStageRefPtr stage() { return selectedPrim().GetStage(); }
 
 } // namespace TINKERUSD_NS

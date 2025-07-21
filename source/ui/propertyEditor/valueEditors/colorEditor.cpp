@@ -1,8 +1,8 @@
 #include "colorEditor.h"
 
+#include <QColorDialog>
 #include <QMouseEvent>
 #include <QVBoxLayout>
-#include <QColorDialog>
 
 namespace TINKERUSD_NS
 {
@@ -17,8 +17,7 @@ ColorSwatchWidget::ColorSwatchWidget(QWidget* parent)
     layout->addWidget(m_colorButton);
 
     m_colorButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    m_colorButton->setStyleSheet(
-        "QPushButton { border: 1px solid #CCCCCC; background-color: white; }");
+    m_colorButton->setStyleSheet("QPushButton { border: 1px solid #CCCCCC; background-color: white; }");
 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -33,8 +32,7 @@ void ColorSwatchWidget::setColor(const QColor& color)
     {
         m_color = color;
         m_colorButton->setStyleSheet(
-            QString("QPushButton { border: 1px solid #CCCCCC; background-color: %1; }")
-                .arg(m_color.name()));
+            QString("QPushButton { border: 1px solid #CCCCCC; background-color: %1; }").arg(m_color.name()));
         emit colorChanged(m_color);
         emit commitData();
     }
@@ -43,8 +41,9 @@ void ColorSwatchWidget::setColor(const QColor& color)
 void ColorSwatchWidget::onButtonClicked()
 {
     QColor newColor = QColorDialog::getColor(m_color, this, tr("Select Color"));
-    
-    if (newColor.isValid()) {
+
+    if (newColor.isValid())
+    {
         setColor(newColor);
     }
 }
@@ -62,8 +61,7 @@ PXR_NS::VtValue ColorEditor::toVtValue(const QVariant& value) const
     {
         return PXR_NS::VtValue(PXR_NS::GfVec3f(color.redF(), color.greenF(), color.blueF()));
     }
-    return PXR_NS::VtValue(
-        PXR_NS::GfVec4f(color.redF(), color.greenF(), color.blueF(), color.alphaF()));
+    return PXR_NS::VtValue(PXR_NS::GfVec4f(color.redF(), color.greenF(), color.blueF(), color.alphaF()));
 }
 
 QVariant ColorEditor::fromVtValue(const PXR_NS::VtValue& value) const

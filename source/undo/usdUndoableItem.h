@@ -19,7 +19,7 @@
 #include <functional>
 #include <vector>
 
-namespace TINKERUSD_NS 
+namespace TINKERUSD_NS
 {
 
 //! \brief UsdUndoableItem

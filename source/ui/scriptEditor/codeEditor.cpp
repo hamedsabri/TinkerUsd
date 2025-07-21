@@ -27,7 +27,8 @@ int CodeEditor::lineNumberAreaWidth()
 {
     int digits = 1;
     int max = qMax(1, blockCount());
-    while (max >= 10) {
+    while (max >= 10)
+    {
         max /= 10;
         ++digits;
     }
@@ -93,8 +94,7 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent* event)
         {
             QString number = QString::number(blockNumber + 1);
             painter.setPen(QColor(180, 180, 180));
-            painter.drawText(
-                0, top, lineNumberArea->width(), fontMetrics().height(), Qt::AlignRight, number);
+            painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(), Qt::AlignRight, number);
         }
 
         block = block.next();

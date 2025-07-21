@@ -2,13 +2,12 @@
 
 #include <QColor>
 #include <QOpenGLFunctions_4_5_Core>
-
 #include <pxr/base/gf/matrix4f.h>
 #include <pxr/base/tf/token.h>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace TINKERUSD_NS 
+namespace TINKERUSD_NS
 {
 
 class UsdCamera;
@@ -34,7 +33,7 @@ private:
     GLuint m_vbo;
     GLuint m_shaderProgram;
     float  m_size;
-    int m_cellCount;
+    int    m_cellCount;
     QColor m_baseLinesColor;
     QColor m_majorLinesColor;
 };

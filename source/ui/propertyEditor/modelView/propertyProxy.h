@@ -9,7 +9,7 @@ namespace TINKERUSD_NS
 
 /*
  * @class PropertyProxy
- * @brief This class provides support for sorting and filtering 
+ * @brief This class provides support for sorting and filtering
  *        data passed between another model and a view.
  */
 class PropertyProxy : public QSortFilterProxyModel

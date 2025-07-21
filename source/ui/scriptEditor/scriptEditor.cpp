@@ -59,15 +59,11 @@ static PyObject* redirector_write(PyObject* self, PyObject* args)
     return Py_BuildValue("");
 }
 
-static PyMethodDef RedirectorMethods[]
-    = { { "write", redirector_write, METH_VARARGS, "Write to Qt console" },
-        { nullptr, nullptr, 0, nullptr } };
+static PyMethodDef RedirectorMethods[] = { { "write", redirector_write, METH_VARARGS, "Write to Qt console" },
+                                           { nullptr, nullptr, 0, nullptr } };
 
-static PyModuleDef RedirectorModule = { PyModuleDef_HEAD_INIT,
-                                        "redirector",
-                                        "Redirector module for Python output",
-                                        -1,
-                                        RedirectorMethods };
+static PyModuleDef RedirectorModule
+    = { PyModuleDef_HEAD_INIT, "redirector", "Redirector module for Python output", -1, RedirectorMethods };
 
 static PyObject* PyInit_Redirector(void) { return PyModule_Create(&RedirectorModule); }
 
@@ -189,10 +185,7 @@ void ScriptEditor::setupUI()
     connect(clearEditorButton, &QPushButton::clicked, this, &ScriptEditor::clearCurrentEditor);
     connect(addTabButton, &QToolButton::clicked, this, &ScriptEditor::addNewTab);
     connect(
-        m_tabWidget->tabBar(),
-        &QTabBar::customContextMenuRequested,
-        this,
-        &ScriptEditor::showTabContextMenu);
+        m_tabWidget->tabBar(), &QTabBar::customContextMenuRequested, this, &ScriptEditor::showTabContextMenu);
     connect(m_tabWidget, &QTabWidget::tabCloseRequested, this, &ScriptEditor::closeTab);
 }
 
@@ -224,11 +217,13 @@ void ScriptEditor::runScript()
 
     PyObject* result = PyRun_String(script.toUtf8().constData(), Py_file_input, globals, locals);
 
-    if (result) {
+    if (result)
+    {
         Py_DECREF(result);
         m_outputConsole->appendPlainText(script);
     }
-    else {
+    else
+    {
         PyErr_Print();
     }
 
@@ -237,7 +232,8 @@ void ScriptEditor::runScript()
 
 void ScriptEditor::clearOutput()
 {
-    if (m_outputConsole){
+    if (m_outputConsole)
+    {
         m_outputConsole->clear();
     }
 }
@@ -245,7 +241,8 @@ void ScriptEditor::clearOutput()
 void ScriptEditor::clearCurrentEditor()
 {
     CodeEditor* scriptEditor = currentScriptEditor();
-    if (scriptEditor) {
+    if (scriptEditor)
+    {
         scriptEditor->clear();
     }
 }
@@ -270,12 +267,14 @@ void ScriptEditor::showTabContextMenu(const QPoint& point)
     QAction* closeAction = menu.addAction("Close Tab");
 
     connect(renameAction, &QAction::triggered, this, &ScriptEditor::renameCurrentTab);
-    
+
     // don't allow closing the last tab
-    if (m_tabWidget->count() > 1) { 
+    if (m_tabWidget->count() > 1)
+    {
         connect(closeAction, &QAction::triggered, [=]() { this->closeTab(tabIndex); });
     }
-    else {
+    else
+    {
         closeAction->setEnabled(false);
     }
 
@@ -292,7 +291,8 @@ void ScriptEditor::renameCurrentTab()
         bool    ok;
         QString newName = QInputDialog::getText(
             this, tr("Rename Tab"), tr("Tab name:"), QLineEdit::Normal, currentName, &ok);
-        if (ok && !newName.isEmpty()) {
+        if (ok && !newName.isEmpty())
+        {
             m_tabWidget->setTabText(currentIndex, newName);
         }
     }
@@ -300,7 +300,8 @@ void ScriptEditor::renameCurrentTab()
 
 void ScriptEditor::closeTab(size_t index)
 {
-    if (m_tabWidget->count() <= 1) {
+    if (m_tabWidget->count() <= 1)
+    {
         return;
     }
 

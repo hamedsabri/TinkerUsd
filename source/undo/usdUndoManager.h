@@ -19,14 +19,13 @@
 #include "core/utils.h"
 #include "usdUndoableItem.h"
 
-#include <pxr/usd/sdf/layer.h>
-
 #include <functional>
+#include <pxr/usd/sdf/layer.h>
 #include <vector>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace TINKERUSD_NS 
+namespace TINKERUSD_NS
 {
 
 //! \brief Singleton class to manage layer states.

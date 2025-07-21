@@ -37,8 +37,7 @@ QStringList convert(const VtTokenArray& tokenArray)
     return stringList;
 }
 
-std::optional<std::string_view>
-removePrefix(std::string_view attributeName, std::string_view prefix)
+std::optional<std::string_view> removePrefix(std::string_view attributeName, std::string_view prefix)
 {
     if (attributeName.substr(0, prefix.size()) == prefix)
     {

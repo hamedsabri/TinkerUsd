@@ -21,7 +21,7 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace TINKERUSD_NS 
+namespace TINKERUSD_NS
 {
 
 UsdUndoManager& UsdUndoManager::instance()
@@ -34,16 +34,17 @@ void UsdUndoManager::trackLayerStates(const SdfLayerHandle& layer)
 {
     // Check if the layer has already been given a UsdUndoStateDelegate
     // if the cast fails that means we need to set a new one.
-    auto usdUndoStateDelegatePtr
-        = TfDynamic_cast<UsdUndoStateDelegatePtr>(layer->GetStateDelegate());
-    if (!usdUndoStateDelegatePtr) {
+    auto usdUndoStateDelegatePtr = TfDynamic_cast<UsdUndoStateDelegatePtr>(layer->GetStateDelegate());
+    if (!usdUndoStateDelegatePtr)
+    {
         layer->SetStateDelegate(UsdUndoStateDelegate::New());
     }
 }
 
 void UsdUndoManager::addInverse(UsdUndoableItem::InvertFunc func)
 {
-    if (UsdUndoBlock::depth() == 0) {
+    if (UsdUndoBlock::depth() == 0)
+    {
         TF_CODING_ERROR("Collecting invert functions outside of undoblock is not allowed!");
         return;
     }
@@ -54,11 +55,14 @@ void UsdUndoManager::addInverse(UsdUndoableItem::InvertFunc func)
 void UsdUndoManager::transferEdits(UsdUndoableItem& undoableItem, bool extraEdits)
 {
     // transfer the edits
-    if (extraEdits) {
+    if (extraEdits)
+    {
         undoableItem._invertFuncs.insert(
             undoableItem._invertFuncs.begin(), _invertFuncs.begin(), _invertFuncs.end());
         _invertFuncs.clear();
-    } else {
+    }
+    else
+    {
         undoableItem._invertFuncs = std::move(_invertFuncs);
     }
 }

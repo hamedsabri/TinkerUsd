@@ -14,11 +14,8 @@ class AbstractPropertyEditor;
 class PropertyItem : public QStandardItem
 {
 public:
-    PropertyItem(const QString& name, 
-                 const QVariant& value, 
-                 AbstractPropertyEditor* editor = nullptr);
+    PropertyItem(const QString& name, const QVariant& value, AbstractPropertyEditor* editor = nullptr);
 
-    
     virtual ~PropertyItem() = default;
 
     // returns a pointer to AbstractPropertyEditor

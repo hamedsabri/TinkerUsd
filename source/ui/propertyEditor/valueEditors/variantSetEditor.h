@@ -11,15 +11,16 @@ namespace TINKERUSD_NS
 /**
  * @class VariantSetEditor
  * @brief Custom editor to display and edit variants.
- * 
+ *
  */
 class VariantSetEditor : public AbstractPropertyEditor
 {
 public:
-    VariantSetEditor(const QString &name, 
-                     const EnumData &enumData,
-                     const PXR_NS::UsdVariantSet& variantSet,
-                     const QString &tooltip = QString());
+    VariantSetEditor(
+        const QString&               name,
+        const EnumData&              enumData,
+        const PXR_NS::UsdVariantSet& variantSet,
+        const QString&               tooltip = QString());
 
     virtual ~VariantSetEditor() = default;
 

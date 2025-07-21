@@ -1,4 +1,5 @@
 #include "mainMenuBar.h"
+
 #include "undomanager.h"
 
 #include <QAction>
@@ -30,7 +31,7 @@ void MainMenuBar::setupMenus()
     fileMenu->addAction(quitAction);
 
     // edit
-    QMenu* editMenu = addMenu("Edit");
+    QMenu*   editMenu = addMenu("Edit");
     QAction* undoAction = UndoManager::createUndoAction(this);
     QAction* redoAction = UndoManager::createRedoAction(this);
     QAction* clearUndoAction = new QAction("Clear Undo History", this);
@@ -47,7 +48,7 @@ void MainMenuBar::setupMenus()
     m_panelsMenu = addMenu("Panels");
 
     // camera
-    QMenu* cameraMenu = addMenu("Camera");
+    QMenu*   cameraMenu = addMenu("Camera");
     QAction* frameSelectedAction = new QAction("Frame Selected", this);
     frameSelectedAction->setShortcut(QKeySequence(Qt::Key_F));
     QAction* resetAction = new QAction("Reset", this);
@@ -55,7 +56,7 @@ void MainMenuBar::setupMenus()
     cameraMenu->addAction(resetAction);
 
     // help
-    QMenu* helpMenu = addMenu("Help");
+    QMenu*   helpMenu = addMenu("Help");
     QAction* about = new QAction("About", this);
     helpMenu->addAction(about);
 
@@ -74,20 +75,15 @@ void MainMenuBar::setupMenus()
             "About",
             "TinkerUsd\n"
             "Version 0.1.0\n\n"
-            "Author: Hamed Sabri\n"
-        );
+            "Author: Hamed Sabri\n");
     });
 
-    connect(frameSelectedAction, &QAction::triggered,this, &MainMenuBar::camFrameSelectSignal);
-    connect(resetAction, &QAction::triggered,this, &MainMenuBar::camResetSignal);
+    connect(frameSelectedAction, &QAction::triggered, this, &MainMenuBar::camFrameSelectSignal);
+    connect(resetAction, &QAction::triggered, this, &MainMenuBar::camResetSignal);
 
-    connect(clearUndoAction, &QAction::triggered, this, []() {
-        UndoManager::undoStack()->clear();
-    });
+    connect(clearUndoAction, &QAction::triggered, this, []() { UndoManager::undoStack()->clear(); });
 
-    connect(debugUndoStackAction, &QAction::triggered, this, []() {
-        UndoManager::displayUndoStackInfo();
-    });
+    connect(debugUndoStackAction, &QAction::triggered, this, []() { UndoManager::displayUndoStackInfo(); });
 }
 
 } // namespace TINKERUSD_NS

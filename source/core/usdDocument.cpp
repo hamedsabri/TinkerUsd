@@ -1,6 +1,7 @@
 #include "UsdDocument.h"
-#include "undo/usdUndoManager.h"
+
 #include "ui/undoManager.h"
+#include "undo/usdUndoManager.h"
 
 #include <QMessageBox>
 
@@ -16,7 +17,8 @@ PXR_NS::UsdStageRefPtr UsdDocument::createNewStageInMemory()
 {
     m_stage = PXR_NS::UsdStage::CreateInMemory();
 
-    if (m_stage) {
+    if (m_stage)
+    {
         emit stageOpened("untitled");
 
         // clear undo stack
@@ -24,7 +26,8 @@ PXR_NS::UsdStageRefPtr UsdDocument::createNewStageInMemory()
 
         UsdUndoManager::instance().trackLayerStates(m_stage->GetEditTarget().GetLayer());
     }
-    else {
+    else
+    {
         // TODO: Log.Error
         return nullptr;
     }
@@ -36,7 +39,8 @@ PXR_NS::UsdStageRefPtr UsdDocument::openStage(const QString& path)
 {
     m_stage = PXR_NS::UsdStage::Open(path.toStdString(), PXR_NS::UsdStage::LoadAll);
 
-    if (m_stage) {
+    if (m_stage)
+    {
         emit stageOpened(path);
 
         // clear undo stack
@@ -44,7 +48,8 @@ PXR_NS::UsdStageRefPtr UsdDocument::openStage(const QString& path)
 
         UsdUndoManager::instance().trackLayerStates(m_stage->GetEditTarget().GetLayer());
     }
-    else {
+    else
+    {
         // TODO: Log.Error
         return nullptr;
     }
@@ -52,15 +57,9 @@ PXR_NS::UsdStageRefPtr UsdDocument::openStage(const QString& path)
     return m_stage;
 }
 
-PXR_NS::UsdStageRefPtr UsdDocument::getCurrentStage() const 
-{ 
-    return m_stage; 
-}
+PXR_NS::UsdStageRefPtr UsdDocument::getCurrentStage() const { return m_stage; }
 
-PXR_NS::SdfLayerRefPtr UsdDocument::getCurrentLayer() const 
-{ 
-    return m_stage->GetRootLayer(); 
-}
+PXR_NS::SdfLayerRefPtr UsdDocument::getCurrentLayer() const { return m_stage->GetRootLayer(); }
 
 void UsdDocument::setEditTargetLayer(PXR_NS::SdfLayerHandle layer)
 {

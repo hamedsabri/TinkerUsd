@@ -17,7 +17,7 @@ public:
     UsdOutlinerView(QWidget* parent = nullptr);
     virtual ~UsdOutlinerView() = default;
 
-    void setStage(const PXR_NS::UsdStageRefPtr& stage);
+    void       setStage(const PXR_NS::UsdStageRefPtr& stage);
     QLineEdit* searchLineEdit() const { return m_searchLineEdit; }
 
     void focusPrim(const PXR_NS::UsdPrim& prim);

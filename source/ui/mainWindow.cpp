@@ -1,7 +1,6 @@
 #include "mainWindow.h"
 
 #include "DockManager.h"
-
 #include "composition/compositionInspectorWidget.h"
 #include "core/globalSelection.h"
 #include "core/usdDocument.h"
@@ -18,7 +17,6 @@
 #include <QStatusBar>
 #include <QToolBar>
 
-    
 namespace TINKERUSD_NS
 {
 
@@ -59,8 +57,7 @@ MainWindow::MainWindow(QWidget* parent)
     ads::CDockWidget* openGlViewportDockWidget = new ads::CDockWidget("Viewport");
     openGlViewportDockWidget->setWidget(viewportGLWidget);
 
-    openGlViewportDockWidget->setMinimumSizeHintMode(
-        ads::CDockWidget::MinimumSizeHintFromDockWidget);
+    openGlViewportDockWidget->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
     openGlViewportDockWidget->setMinimumSize(600, 150);
 
     openGlViewportDockWidget->setFeature(ads::CDockWidget::DockWidgetClosable, false);
@@ -74,27 +71,19 @@ MainWindow::MainWindow(QWidget* parent)
     aovComboBox->setToolTip("Select AOV");
     toolBar->addWidget(aovComboBox);
     QObject::connect(
-        aovComboBox,
-        &QComboBox::currentTextChanged,
-        this,
-        [viewportGLWidget](const QString& aov) {
+        aovComboBox, &QComboBox::currentTextChanged, this, [viewportGLWidget](const QString& aov) {
             viewportGLWidget->setRendererAov(aov.toStdString());
         });
 
     toolBar->addSeparator();
 
     shadingComboBox->setToolTip("Select Shading");
+    shadingComboBox->addItem("Smooth", static_cast<int>(ViewportOpenGLWidget::ShadingMode::SHADEDSMOOTH));
+    shadingComboBox->addItem("Points", static_cast<int>(ViewportOpenGLWidget::ShadingMode::POINTS));
+    shadingComboBox->addItem("Wireframe", static_cast<int>(ViewportOpenGLWidget::ShadingMode::WIREFRAME));
     shadingComboBox->addItem(
-        "Smooth", static_cast<int>(ViewportOpenGLWidget::ShadingMode::SHADEDSMOOTH));
-    shadingComboBox->addItem(
-        "Points", static_cast<int>(ViewportOpenGLWidget::ShadingMode::POINTS));
-    shadingComboBox->addItem(
-        "Wireframe", static_cast<int>(ViewportOpenGLWidget::ShadingMode::WIREFRAME));
-    shadingComboBox->addItem(
-        "Wireframe On Surface",
-        static_cast<int>(ViewportOpenGLWidget::ShadingMode::WIREFRAME_ON_SURFACE));
-    shadingComboBox->addItem(
-        "Flat", static_cast<int>(ViewportOpenGLWidget::ShadingMode::SHADED_FLAT));
+        "Wireframe On Surface", static_cast<int>(ViewportOpenGLWidget::ShadingMode::WIREFRAME_ON_SURFACE));
+    shadingComboBox->addItem("Flat", static_cast<int>(ViewportOpenGLWidget::ShadingMode::SHADED_FLAT));
 
     shadingComboBox->setCurrentIndex(static_cast<int>(viewportGLWidget->shadingMode()));
 
@@ -117,8 +106,7 @@ MainWindow::MainWindow(QWidget* parent)
     outlinerDockWidget->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
     outlinerDockWidget->setMinimumSize(340, 150);
 
-    auto dockAreaWidgetOutliner
-        = dockManager->addDockWidget(ads::LeftDockWidgetArea, outlinerDockWidget);
+    auto dockAreaWidgetOutliner = dockManager->addDockWidget(ads::LeftDockWidgetArea, outlinerDockWidget);
     mainMenuBar->getPanelsMenu()->addAction(outlinerDockWidget->toggleViewAction());
 
     // composition
@@ -126,45 +114,41 @@ MainWindow::MainWindow(QWidget* parent)
     compositionDockWidget->setWidget(compInspectorWidget);
     compositionDockWidget->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
     compositionDockWidget->setMinimumSize(340, 150);
-    dockManager->addDockWidget(
-        ads::BottomDockWidgetArea, compositionDockWidget, dockAreaWidgetOutliner);
+    dockManager->addDockWidget(ads::BottomDockWidgetArea, compositionDockWidget, dockAreaWidgetOutliner);
     mainMenuBar->getPanelsMenu()->addAction(compositionDockWidget->toggleViewAction());
 
     // property editor
     ads::CDockWidget* dockWidgetProperty = new ads::CDockWidget("Properties");
     dockWidgetProperty->setWidget(propertyWidget);
     dockWidgetProperty->setMinimumSize(250, 280);
-    auto dockAreaPropertyEditor
-        = dockManager->addDockWidget(ads::RightDockWidgetArea, dockWidgetProperty);
+    auto dockAreaPropertyEditor = dockManager->addDockWidget(ads::RightDockWidgetArea, dockWidgetProperty);
     mainMenuBar->getPanelsMenu()->addAction(dockWidgetProperty->toggleViewAction());
 
     // script editor
     ads::CDockWidget* scriptEditorDockWidget = new ads::CDockWidget("Script Editor");
     scriptEditorDockWidget->setWidget(scriptEditorWidget);
-    dockManager->addDockWidget(
-        ads::BottomDockWidgetArea, scriptEditorDockWidget, dockAreaPropertyEditor);
+    dockManager->addDockWidget(ads::BottomDockWidgetArea, scriptEditorDockWidget, dockAreaPropertyEditor);
     mainMenuBar->getPanelsMenu()->addAction(scriptEditorDockWidget->toggleViewAction());
 
     // connection signal/slots
-    connect(
-        mainMenuBar,
-        &MainMenuBar::requestNewStage,
-        usdDocument,
-        &UsdDocument::createNewStageInMemory);
+    connect(mainMenuBar, &MainMenuBar::requestNewStage, usdDocument, &UsdDocument::createNewStageInMemory);
     connect(mainMenuBar, &MainMenuBar::requestOpenStage, usdDocument, &UsdDocument::openStage);
 
     connect(usdDocument, &UsdDocument::stageOpened, [this](const QString& filePath) {
         QString baseName = QFileInfo(filePath).fileName();
-        QString title
-            = QString("%1 - TinkerUsd: %2").arg(baseName, QDir::toNativeSeparators(filePath));
+        QString title = QString("%1 - TinkerUsd: %2").arg(baseName, QDir::toNativeSeparators(filePath));
         setWindowTitle(title);
 
         GlobalSelection::instance().clearSelection();
     });
 
-    connect(mainMenuBar,&MainMenuBar::camFrameSelectSignal,viewportGLWidget,&ViewportOpenGLWidget::frameSelected);
+    connect(
+        mainMenuBar,
+        &MainMenuBar::camFrameSelectSignal,
+        viewportGLWidget,
+        &ViewportOpenGLWidget::frameSelected);
 
-    connect(mainMenuBar,&MainMenuBar::camResetSignal,viewportGLWidget,&ViewportOpenGLWidget::reset);
+    connect(mainMenuBar, &MainMenuBar::camResetSignal, viewportGLWidget, &ViewportOpenGLWidget::reset);
 
     auto rendererTypeLabel = new QLabel();
     auto stageUpAxisLabel = new QLabel(QString("Up Axis: %1 ").arg(viewportGLWidget->upAxisDisplayName()));
@@ -177,26 +161,26 @@ MainWindow::MainWindow(QWidget* parent)
         &ViewportOpenGLWidget::rendererAvailable,
         this,
         [this, statusBar, viewportGLWidget, rendererTypeLabel, aovComboBox]() {
-            
-            rendererTypeLabel->setText(
-                QString("Render: %1 ").arg(viewportGLWidget->rendererDisplayName()));
+            rendererTypeLabel->setText(QString("Render: %1 ").arg(viewportGLWidget->rendererDisplayName()));
 
             // aov
             aovComboBox->clear();
             const auto  aovs = viewportGLWidget->getRendererAovs();
             QStringList qAovs;
-            for (const auto& aov : aovs) {
+            for (const auto& aov : aovs)
+            {
                 qAovs.append(QString::fromStdString(aov));
             }
             aovComboBox->addItems(qAovs);
-            if (!aovs.empty()) {
+            if (!aovs.empty())
+            {
                 aovComboBox->setCurrentText(QString::fromStdString(aovs[0]));
             }
         });
 
-        connect(usdDocument, &UsdDocument::stageOpened, this, [this, viewportGLWidget, stageUpAxisLabel]() {
-            stageUpAxisLabel->setText(QString("Up Axis: %1 ").arg(viewportGLWidget->upAxisDisplayName()));
-        });
+    connect(usdDocument, &UsdDocument::stageOpened, this, [this, viewportGLWidget, stageUpAxisLabel]() {
+        stageUpAxisLabel->setText(QString("Up Axis: %1 ").arg(viewportGLWidget->upAxisDisplayName()));
+    });
 }
 
 } // namespace TINKERUSD_NS

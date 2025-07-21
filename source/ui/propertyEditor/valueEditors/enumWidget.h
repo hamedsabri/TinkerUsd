@@ -16,12 +16,13 @@ class NoWheelComboBox : public QComboBox
 {
     Q_OBJECT
 public:
-    NoWheelComboBox(QWidget* parent = nullptr) : QComboBox(parent) {}
+    NoWheelComboBox(QWidget* parent = nullptr)
+        : QComboBox(parent)
+    {
+    }
 
 protected:
-    void wheelEvent(QWheelEvent* e) override {
-        e->ignore();
-    }
+    void wheelEvent(QWheelEvent* e) override { e->ignore(); }
 };
 
 /**
@@ -29,13 +30,20 @@ protected:
  * @brief A structure to hold enum data
  *
  */
-struct EnumData 
+struct EnumData
 {
     QStringList options;
-    QString currentText;
+    QString     currentText;
 
-    EnumData() : currentText("") {}
-    EnumData(const QStringList& opts, const QString& ctext) : options(opts), currentText(ctext) {}
+    EnumData()
+        : currentText("")
+    {
+    }
+    EnumData(const QStringList& opts, const QString& ctext)
+        : options(opts)
+        , currentText(ctext)
+    {
+    }
 };
 Q_DECLARE_METATYPE(EnumData)
 
@@ -47,7 +55,7 @@ Q_DECLARE_METATYPE(EnumData)
 class PropertyComboBoxWidget : public QWidget
 {
     Q_OBJECT
-public :
+public:
     PropertyComboBoxWidget(QWidget* parent = nullptr);
 
     NoWheelComboBox* comboBox() const;

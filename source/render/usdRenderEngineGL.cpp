@@ -3,9 +3,8 @@
 #include "camera/usdCamera.h"
 #include "core/globalSelection.h"
 
-#include <pxr/usdImaging/usdImaging/delegate.h>
-
 #include <pxr/usd/usd/prim.h>
+#include <pxr/usdImaging/usdImaging/delegate.h>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
@@ -15,10 +14,10 @@ namespace TINKERUSD_NS
 void UsdRenderEngineGL::initialize(const PXR_NS::UsdStageRefPtr& stage)
 {
     PXR_NS::SdfPathVector excludedPaths;
-    m_usdGLEngine = std::make_unique<PXR_NS::UsdImagingGLEngine>(
-        stage->GetPseudoRoot().GetPath(), excludedPaths);
+    m_usdGLEngine
+        = std::make_unique<PXR_NS::UsdImagingGLEngine>(stage->GetPseudoRoot().GetPath(), excludedPaths);
 
-    addBboxRenderParams( stageBbox( stage ) );
+    addBboxRenderParams(stageBbox(stage));
 
     // camera light
     m_cameraLight.SetAmbient({ 0.1, 0.1, 0.1, 1.0 });
@@ -35,13 +34,9 @@ void UsdRenderEngineGL::initialize(const PXR_NS::UsdStageRefPtr& stage)
     m_lights.push_back(m_cameraLight);
 }
 
-void UsdRenderEngineGL::render(
-    const PXR_NS::UsdStageRefPtr& stage,
-    UsdCamera*                 camera,
-    double                     w,
-    double                     h)
+void UsdRenderEngineGL::render(const PXR_NS::UsdStageRefPtr& stage, UsdCamera* camera, double w, double h)
 {
-    camera->setAspectRatio( w / std::max(1.0, h) );
+    camera->setAspectRatio(w / std::max(1.0, h));
 
     camera->updateTransform();
 
@@ -68,15 +63,9 @@ void UsdRenderEngineGL::render(
     m_usdGLEngine->Render(stage->GetPseudoRoot(), m_params);
 }
 
-PXR_NS::UsdImagingGLRenderParams& UsdRenderEngineGL::params() 
-{ 
-    return m_params; 
-}
+PXR_NS::UsdImagingGLRenderParams& UsdRenderEngineGL::params() { return m_params; }
 
-pxr::UsdImagingGLEngine* UsdRenderEngineGL::getUsdImagingGLEngine() const
-{ 
-    return m_usdGLEngine.get(); 
-}
+pxr::UsdImagingGLEngine* UsdRenderEngineGL::getUsdImagingGLEngine() const { return m_usdGLEngine.get(); }
 
 std::string UsdRenderEngineGL::rendererDisplayName() const
 {
@@ -86,16 +75,14 @@ std::string UsdRenderEngineGL::rendererDisplayName() const
 std::vector<std::string> UsdRenderEngineGL::getRendererAovs() const
 {
     std::vector<std::string> result;
-    for (const auto& aov : m_usdGLEngine->GetRendererAovs()) {
+    for (const auto& aov : m_usdGLEngine->GetRendererAovs())
+    {
         result.emplace_back(aov);
     }
     return result;
 }
 
-void UsdRenderEngineGL::setRendererAov(const std::string& name) 
-{ 
-    m_aov = name; 
-}
+void UsdRenderEngineGL::setRendererAov(const std::string& name) { m_aov = name; }
 
 void UsdRenderEngineGL::addBboxRenderParams(const GfBBox3d& bBox)
 {

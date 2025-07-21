@@ -5,7 +5,4 @@
 
 using namespace PXR_BOOST_PYTHON_NAMESPACE;
 
-void wrapGlobal() 
-{ 
-    def("stage", TINKERUSD_NS::stage); 
-}
+void wrapGlobal() { def("stage", TINKERUSD_NS::stage); }

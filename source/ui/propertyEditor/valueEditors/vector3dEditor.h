@@ -1,11 +1,11 @@
 #pragma once
 
 #include "abstractPropertyEditor.h"
-#include "customWidgets/valueEntryLineEdit.h"
+#include "customWidgets/numericWidgets.h"
 
 #include <QtGui/QVector3D>
-#include <QtWidgets/QWidget>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QWidget>
 
 namespace TINKERUSD_NS
 {
@@ -18,8 +18,10 @@ class AbstractVector3DWidget : public QWidget
 {
     Q_OBJECT
 public:
-    
-    AbstractVector3DWidget(QWidget *parent = nullptr) : QWidget(parent) {}
+    AbstractVector3DWidget(QWidget* parent = nullptr)
+        : QWidget(parent)
+    {
+    }
 
     virtual ~AbstractVector3DWidget() = default;
 
@@ -27,7 +29,7 @@ public:
     virtual QVector3D getValue() const = 0;
 
     // set a new 3D vector value
-    virtual void setValue(const QVector3D &vec) = 0;
+    virtual void setValue(const QVector3D& vec) = 0;
 
 signals:
     // signal emitted when the data should be committed.
@@ -40,14 +42,12 @@ public slots:
 /**
  * @class Vector3DEditorWidget
  * @brief A template-based widget for a Vector3D.
- * 
+ *
  */
-template<typename T>
-class Vector3DEditorWidget : public AbstractVector3DWidget
+template <typename T> class Vector3DEditorWidget : public AbstractVector3DWidget
 {
 public:
-    
-    Vector3DEditorWidget(QWidget *parent = nullptr);
+    Vector3DEditorWidget(QWidget* parent = nullptr);
 
     virtual ~Vector3DEditorWidget() = default;
 
@@ -61,14 +61,15 @@ public:
     void setRange(const QPair<T, T>& range);
 
 private:
-    void addComponentToLayout(QHBoxLayout* layout, 
-                              const QString& labelText, 
-                              DoubleValueLineEdit* lineEdit, 
-                              const QColor& backgroundColor);
+    void addComponentToLayout(
+        QHBoxLayout*      layout,
+        const QString&    labelText,
+        ValueLineEdit<T>* lineEdit,
+        const QColor&     backgroundColor);
 
-    DoubleValueLineEdit* m_xLineEdit;
-    DoubleValueLineEdit* m_yLineEdit;
-    DoubleValueLineEdit* m_zLineEdit;
+    ValueLineEdit<T>* m_xLineEdit;
+    ValueLineEdit<T>* m_yLineEdit;
+    ValueLineEdit<T>* m_zLineEdit;
 };
 
 /**
@@ -76,14 +77,20 @@ private:
  * @brief A structure to hold data for 3D vectors
  *
  */
-template<typename T>
-struct Vector3dData
+template <typename T> struct Vector3dData
 {
     QPair<T, T> m_range;
-    QVector3D m_defaultValue;
+    QVector3D   m_defaultValue;
 
-    Vector3dData() : m_defaultValue(QVector3D()) {}
-    Vector3dData(const QPair<T, T>& range, const QVector3D& defaultValue) : m_range(range), m_defaultValue(defaultValue) {}
+    Vector3dData()
+        : m_defaultValue(QVector3D())
+    {
+    }
+    Vector3dData(const QPair<T, T>& range, const QVector3D& defaultValue)
+        : m_range(range)
+        , m_defaultValue(defaultValue)
+    {
+    }
 };
 
 Q_DECLARE_METATYPE(Vector3dData<float>)
@@ -92,16 +99,16 @@ Q_DECLARE_METATYPE(Vector3dData<double>)
 /**
  * @class Vector3DEditor
  * @brief A 3D vector editor.
- * 
+ *
  */
-template<typename T>
-class Vector3DEditor : public AbstractPropertyEditor
+template <typename T> class Vector3DEditor : public AbstractPropertyEditor
 {
 public:
-    Vector3DEditor(const QString& name, 
-                   const Vector3dData<T>& currentValue, 
-                   const QString& tooltip = QString());
-    
+    Vector3DEditor(
+        const QString&         name,
+        const Vector3dData<T>& currentValue,
+        const QString&         tooltip = QString());
+
     virtual ~Vector3DEditor() = default;
 
     // convert QVariant to Pixar's VtValue
@@ -123,10 +130,10 @@ private:
     QPair<T, T> m_range;
 };
 
-using Vector3dDataFloat    = Vector3dData<float>;
-using Vector3dDataDouble   = Vector3dData<double>;
+using Vector3dDataFloat = Vector3dData<float>;
+using Vector3dDataDouble = Vector3dData<double>;
 
-using Vector3DEditorFloat  = Vector3DEditor<float>;
+using Vector3DEditorFloat = Vector3DEditor<float>;
 using Vector3DEditorDouble = Vector3DEditor<double>;
 
 } // namespace TINKERUSD_NS

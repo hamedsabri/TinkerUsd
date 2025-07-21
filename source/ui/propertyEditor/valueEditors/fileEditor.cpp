@@ -1,18 +1,17 @@
 #include "fileEditor.h"
 
-#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QHBoxLayout>
 
-namespace TINKERUSD_NS 
+namespace TINKERUSD_NS
 {
 
-FileEditorWidget::FileEditorWidget(QWidget *parent)
+FileEditorWidget::FileEditorWidget(QWidget* parent)
     : QWidget(parent)
     , m_lineEdit(new QLineEdit(this))
     , m_browseButton(new QToolButton(this))
 {
-    QHBoxLayout *layout = new QHBoxLayout(this);
+    QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
     layout->addWidget(m_lineEdit);
@@ -26,41 +25,36 @@ FileEditorWidget::FileEditorWidget(QWidget *parent)
     m_browseButton->setText("");
     m_browseButton->setAutoRaise(true);
     m_browseButton->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding));
-    m_browseButton->setStyleSheet("QToolButton { border: none; padding: 0px; } QToolButton::hover { background: none; }");
+    m_browseButton->setStyleSheet(
+        "QToolButton { border: none; padding: 0px; } QToolButton::hover { background: none; }");
     m_lineEdit->setPlaceholderText("Path to a USD file...");
 
     connect(m_browseButton, &QToolButton::clicked, this, &FileEditorWidget::browse);
     connect(m_lineEdit, &QLineEdit::editingFinished, this, &FileEditorWidget::commitData);
 }
 
-QString FileEditorWidget::filePath() const
-{
-    return m_lineEdit->text();
-}
+QString FileEditorWidget::filePath() const { return m_lineEdit->text(); }
 
-void FileEditorWidget::setFilePath(const QString &path)
-{
-    m_lineEdit->setText(path);
-}
+void FileEditorWidget::setFilePath(const QString& path) { m_lineEdit->setText(path); }
 
 void FileEditorWidget::browse()
 {
-    QString filePath = QFileDialog::getOpenFileName(this, 
-                                                    tr("Select a USD file"), 
-                                                    "", 
-                                                    tr("USD Files (*.usd *.usda *.usdc)"));
-    if (!filePath.isEmpty()) {
+    QString filePath = QFileDialog::getOpenFileName(
+        this, tr("Select a USD file"), "", tr("USD Files (*.usd *.usda *.usdc)"));
+    if (!filePath.isEmpty())
+    {
         setFilePath(filePath);
         emit commitData();
     }
 }
 
-FileEditor::FileEditor(const QString &name, const FileEditorData &data, const QString &tooltip)
-    : AbstractPropertyEditor(name, data.m_defaultValue, tooltip), m_defaultValue(data.m_defaultValue)
+FileEditor::FileEditor(const QString& name, const FileEditorData& data, const QString& tooltip)
+    : AbstractPropertyEditor(name, data.m_defaultValue, tooltip)
+    , m_defaultValue(data.m_defaultValue)
 {
 }
 
-QWidget* FileEditor::createEditor(QWidget *parent) const
+QWidget* FileEditor::createEditor(QWidget* parent) const
 {
     FileEditorWidget* fileEditorWidget = new FileEditorWidget(parent);
     fileEditorWidget->setFilePath(m_defaultValue);
@@ -75,25 +69,28 @@ PXR_NS::VtValue FileEditor::toVtValue(const QVariant& value) const
 
 QVariant FileEditor::fromVtValue(const PXR_NS::VtValue& value) const
 {
-    if (value.IsHolding<PXR_NS::SdfAssetPath>()) {
+    if (value.IsHolding<PXR_NS::SdfAssetPath>())
+    {
         PXR_NS::SdfAssetPath assetPath = value.Get<PXR_NS::SdfAssetPath>();
         return QVariant(QString::fromStdString(assetPath.GetAssetPath()));
     }
     return QVariant();
 }
 
-void FileEditor::setEditorData(QWidget *editor, const QVariant &data) const
+void FileEditor::setEditorData(QWidget* editor, const QVariant& data) const
 {
     FileEditorWidget* fileEditorWidget = qobject_cast<FileEditorWidget*>(editor);
-    if (fileEditorWidget) {
+    if (fileEditorWidget)
+    {
         fileEditorWidget->setFilePath(data.toString());
     }
 }
 
-QVariant FileEditor::editorData(QWidget *editor) const
+QVariant FileEditor::editorData(QWidget* editor) const
 {
     FileEditorWidget* fileEditorWidget = qobject_cast<FileEditorWidget*>(editor);
-    if (fileEditorWidget) {
+    if (fileEditorWidget)
+    {
         return fileEditorWidget->filePath();
     }
     return QVariant();

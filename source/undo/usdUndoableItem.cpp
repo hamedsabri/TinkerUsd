@@ -15,11 +15,13 @@
 //
 
 #include "usdUndoableItem.h"
+
 #include "usdUndoBlock.h"
 
 #include <pxr/usd/sdf/changeBlock.h>
 
-namespace TINKERUSD_NS {
+namespace TINKERUSD_NS
+{
 
 void UsdUndoableItem::undo() { doInvert(); }
 
@@ -27,7 +29,8 @@ void UsdUndoableItem::redo() { doInvert(); }
 
 void UsdUndoableItem::doInvert()
 {
-    if (UsdUndoBlock::depth() != 0) {
+    if (UsdUndoBlock::depth() != 0)
+    {
         TF_CODING_ERROR("Inversion during open edit block may result in corrupted undo "
                         "stack.");
     }
@@ -37,7 +40,8 @@ void UsdUndoableItem::doInvert()
     // call invert functions in reverse order
     {
         SdfChangeBlock changeBlock;
-        for (auto it = _invertFuncs.rbegin(); it != _invertFuncs.rend(); ++it) {
+        for (auto it = _invertFuncs.rbegin(); it != _invertFuncs.rend(); ++it)
+        {
             (*it)();
         }
     }

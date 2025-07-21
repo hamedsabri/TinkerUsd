@@ -5,7 +5,6 @@
 
 #include <QMainWindow>
 #include <QVBoxLayout>
-
 #include <pxr/usd/sdf/path.h>
 
 namespace TINKERUSD_NS
@@ -19,8 +18,7 @@ CompositionInspectorWidget::CompositionInspectorWidget(UsdDocument* document, QM
 
     setupLayout();
 
-    connect(
-        m_usdDocument, &UsdDocument::stageOpened, this, &CompositionInspectorWidget::onStageOpened);
+    connect(m_usdDocument, &UsdDocument::stageOpened, this, &CompositionInspectorWidget::onStageOpened);
 
     connect(
         &GlobalSelection::instance(),

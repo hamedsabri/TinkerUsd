@@ -9,14 +9,12 @@ namespace TINKERUSD_NS
 /**
  * @class EnumEditor
  * @brief Custom editor that uses a PropertyComboBoxWidget to display and edit enum values.
- * 
+ *
  */
 class EnumEditor : public AbstractPropertyEditor
 {
 public:
-    EnumEditor(const QString& name, 
-               const EnumData& enumData, 
-               const QString& tooltip = QString());
+    EnumEditor(const QString& name, const EnumData& enumData, const QString& tooltip = QString());
 
     virtual ~EnumEditor() = default;
 
@@ -35,9 +33,7 @@ public:
     // get the current data from the editor widget
     QVariant editorData(QWidget* editor) const override;
 
-    bool paint(QPainter* painter, 
-               const QStyleOptionViewItem& option, 
-               const QVariant& value) const override;
+    bool paint(QPainter* painter, const QStyleOptionViewItem& option, const QVariant& value) const override;
 
 private:
     QStringList m_options;

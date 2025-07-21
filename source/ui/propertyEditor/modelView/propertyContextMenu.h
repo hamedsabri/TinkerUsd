@@ -1,9 +1,9 @@
 #pragma once
 
-#include <QtWidgets/QMenu>
 #include <QtCore/QModelIndex>
+#include <QtWidgets/QMenu>
 
-namespace TINKERUSD_NS 
+namespace TINKERUSD_NS
 {
 
 class PropertyTreeView;
@@ -12,13 +12,11 @@ class PropertyTreeView;
  * @class PropertyContextMenu
  * @brief A context menu for property items in the PropertyTreeView.
  */
-class PropertyContextMenu : public QMenu 
+class PropertyContextMenu : public QMenu
 {
     Q_OBJECT
-public:    
-    PropertyContextMenu(PropertyTreeView* treeView, 
-                        const QModelIndex& index, 
-                        QWidget* parent = nullptr);
+public:
+    PropertyContextMenu(PropertyTreeView* treeView, const QModelIndex& index, QWidget* parent = nullptr);
 
     virtual ~PropertyContextMenu() = default;
 
@@ -27,7 +25,7 @@ private slots:
     void resetToDefault(const QModelIndex& index);
 
     // copies the value of the selected property to the clipboard.
-    void copyPropertyValue(const QModelIndex &index);
+    void copyPropertyValue(const QModelIndex& index);
 
     // copies the path of the selected property to the clipboard.
     void copyPropertyPath(const QModelIndex& index);

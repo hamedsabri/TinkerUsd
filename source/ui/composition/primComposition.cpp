@@ -1,14 +1,14 @@
 #include "primComposition.h"
+
 #include "contentBrowser.h"
 
-#include <QList>
 #include <QAction>
-#include <QClipboard>
-#include <QPainter>
 #include <QApplication>
+#include <QClipboard>
 #include <QHeaderView>
+#include <QList>
 #include <QMenu>
-
+#include <QPainter>
 #include <pxr/base/tf/token.h>
 #include <pxr/usd/pcp/layerStack.h>
 #include <pxr/usd/pcp/node.h>
@@ -46,8 +46,8 @@ QList<QString> rowValuesStr(
     }
 
     auto pathIntro = QString::fromStdString(node.GetPathAtIntroduction().GetString());
-    auto hasSpec = static_cast<bool>((layer->GetObjectAtPath(node.GetPath()))) ? QString("yes")
-                                                                               : QString("no");
+    auto hasSpec
+        = static_cast<bool>((layer->GetObjectAtPath(node.GetPath()))) ? QString("yes") : QString("no");
 
     return { QString::fromStdString(layer->GetDisplayName()), arcType, pathIntro, hasSpec };
 }
@@ -63,8 +63,7 @@ QTreeWidgetItem* walkSublayers(
     QTreeWidgetItem* item;
     if (treeWidget)
     {
-        item = new QTreeWidgetItem(
-            treeWidget, QStringList { rowValuesStr(node, layerTree, sublayer) });
+        item = new QTreeWidgetItem(treeWidget, QStringList { rowValuesStr(node, layerTree, sublayer) });
     }
     else
     {
@@ -141,8 +140,7 @@ void PrimComposition::setupLayout()
     // context menu
     setContextMenuPolicy(Qt::CustomContextMenu);
 
-    connect(
-        this, &QTreeWidget::customContextMenuRequested, this, &PrimComposition::showContextMenu);
+    connect(this, &QTreeWidget::customContextMenuRequested, this, &PrimComposition::showContextMenu);
 
     header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
     header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
@@ -186,8 +184,7 @@ void PrimComposition::showContextMenu(const QPoint& pos)
     {
         std::string layerContent;
         layer->ExportToString(&layerContent);
-        ContentBrowser* contentBroswer
-            = new ContentBrowser(QString::fromStdString(layerContent), this);
+        ContentBrowser* contentBroswer = new ContentBrowser(QString::fromStdString(layerContent), this);
         contentBroswer->show();
     }
 }

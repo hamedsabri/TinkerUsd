@@ -1,11 +1,9 @@
 #pragma once
 
-
-#include <pxr/usd/usd/stage.h>
-
-#include <QString>
 #include <QLineEdit>
+#include <QString>
 #include <QWidget>
+#include <pxr/usd/usd/stage.h>
 
 namespace TINKERUSD_NS
 {

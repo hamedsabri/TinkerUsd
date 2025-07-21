@@ -69,18 +69,12 @@ PXR_NS::TfToken UsdAttributeWrapper::name() const
     }
 }
 
-QString UsdAttributeWrapper::path() const
-{
-    return QString::fromStdString(m_usdAttr.GetPath().GetString());
-}
+QString UsdAttributeWrapper::path() const { return QString::fromStdString(m_usdAttr.GetPath().GetString()); }
 
 PXR_NS::UsdPrim UsdAttributeWrapper::usdPrim() const { return m_usdAttr.GetPrim(); }
 
 PXR_NS::UsdAttribute UsdAttributeWrapper::usdAttribute() const { return m_usdAttr; }
 
-PXR_NS::SdfValueTypeName UsdAttributeWrapper::usdAttributeType() const
-{
-    return m_usdAttr.GetTypeName();
-}
+PXR_NS::SdfValueTypeName UsdAttributeWrapper::usdAttributeType() const { return m_usdAttr.GetTypeName(); }
 
 } // namespace TINKERUSD_NS

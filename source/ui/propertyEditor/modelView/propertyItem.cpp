@@ -13,9 +13,6 @@ PropertyItem::PropertyItem(const QString& name, const QVariant& value, AbstractP
     setData(QVariant::fromValue(static_cast<void*>(editor)), Qt::UserRole);
 }
 
-AbstractPropertyEditor* PropertyItem::editor() const
-{
-    return m_abstractPropEditor;
-}
+AbstractPropertyEditor* PropertyItem::editor() const { return m_abstractPropEditor; }
 
 } // namespace TINKERUSD_NS

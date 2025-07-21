@@ -1,4 +1,5 @@
 #include "propertyproxy.h"
+
 #include "common/utils.h"
 #include "valueEditors/abstractPropertyEditor.h"
 
@@ -25,13 +26,17 @@ bool PropertyProxy::filterAcceptsRow(int sourceRow, const QModelIndex& sourcePar
     QModelIndex index1 = sourceModel()->index(sourceRow, 1, sourceParent);
 
     auto propertyEditor = TINKERUSD_NS::Utils::getEditorFromIndex(index1);
-    if (m_specialKeyword == SpecialFilterKeyword::ModifiedValue) {
-        if (propertyEditor && !propertyEditor->isDefault()) {
+    if (m_specialKeyword == SpecialFilterKeyword::ModifiedValue)
+    {
+        if (propertyEditor && !propertyEditor->isDefault())
+        {
             return true;
         }
     }
-    else if (m_specialKeyword == SpecialFilterKeyword::DefaultValue) {
-        if (propertyEditor && propertyEditor->isDefault()) {
+    else if (m_specialKeyword == SpecialFilterKeyword::DefaultValue)
+    {
+        if (propertyEditor && propertyEditor->isDefault())
+        {
             return true;
         }
     }
@@ -39,14 +44,17 @@ bool PropertyProxy::filterAcceptsRow(int sourceRow, const QModelIndex& sourcePar
     // normal filtering by property name
     QString propertyName = sourceModel()->data(index0).toString();
 
-    if (filterRegularExpression().match(propertyName).hasMatch()) {
+    if (filterRegularExpression().match(propertyName).hasMatch())
+    {
         return true;
     }
 
     // recursively check children
     int childCount = sourceModel()->rowCount(index0);
-    for (int i = 0; i < childCount; ++i) {
-        if (filterAcceptsRow(i, index0)) {
+    for (int i = 0; i < childCount; ++i)
+    {
+        if (filterAcceptsRow(i, index0))
+        {
             return true;
         }
     }

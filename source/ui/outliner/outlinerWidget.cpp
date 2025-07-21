@@ -4,11 +4,10 @@
 #include "core/usdDocument.h"
 #include "outlinerView.h"
 
-#include <QHeaderView>
 #include <QHBoxLayout>
-#include <QVBoxLayout>
+#include <QHeaderView>
 #include <QShortcut>
-
+#include <QVBoxLayout>
 #include <pxr/usd/usd/modelAPI.h>
 #include <pxr/usd/usdGeom/imageable.h>
 

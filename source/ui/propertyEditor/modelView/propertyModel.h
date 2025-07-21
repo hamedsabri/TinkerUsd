@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QtGui/QStandardItemModel>
-
 #include <pxr/usd/usd/variantSets.h>
 
 namespace TINKERUSD_NS
@@ -15,7 +14,7 @@ namespace TINKERUSD_NS
 class PropertyModel : public QStandardItemModel
 {
     Q_OBJECT
-public:    
+public:
     PropertyModel(QObject* parent = nullptr);
 
     virtual ~PropertyModel() = default;

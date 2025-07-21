@@ -4,10 +4,8 @@
 
 #include <QAbstractItemModel>
 #include <QSortFilterProxyModel>
-
-#include <pxr/usd/usd/prim.h>
-
 #include <memory>
+#include <pxr/usd/usd/prim.h>
 
 namespace TINKERUSD_NS
 {
@@ -32,8 +30,8 @@ public:
     QModelIndex indexFromPrim(const PXR_NS::UsdPrim& prim) const;
 
 private:
-    PXR_NS::UsdStageRefPtr  m_stage;
-    UsdOutlinerItem::Ptr m_rootItem;
+    PXR_NS::UsdStageRefPtr m_stage;
+    UsdOutlinerItem::Ptr   m_rootItem;
 };
 
 class UsdOutlinerFilterProxyModel : public QSortFilterProxyModel

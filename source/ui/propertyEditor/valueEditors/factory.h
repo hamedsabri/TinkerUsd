@@ -14,10 +14,10 @@
 
 namespace TINKERUSD_NS
 {
-    // creates a new AbstractPropertyEditor based on the given UsdAttribute type.
-    AbstractPropertyEditor* createNewAttributeEditor( const PXR_NS::UsdAttribute& usdAttr );
+// creates a new AbstractPropertyEditor based on the given UsdAttribute type.
+AbstractPropertyEditor* createNewAttributeEditor(const PXR_NS::UsdAttribute& usdAttr);
 
-    // creates a new VariantSetEditor based on the given UsdVariantSet.
-    VariantSetEditor* createVariantSetEditor(const PXR_NS::UsdVariantSet& variantSet);
+// creates a new VariantSetEditor based on the given UsdVariantSet.
+VariantSetEditor* createVariantSetEditor(const PXR_NS::UsdVariantSet& variantSet);
 
 } // namespace TINKERUSD_NS

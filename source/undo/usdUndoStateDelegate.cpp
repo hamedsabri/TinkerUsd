@@ -22,7 +22,7 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace 
+namespace
 {
 
 void copySpecAtPath(const SdfAbstractData& src, SdfAbstractData* dst, const SdfPath& path)
@@ -34,7 +34,8 @@ void copySpecAtPath(const SdfAbstractData& src, SdfAbstractData* dst, const SdfP
     const std::vector<TfToken>& tokens = src.List(path);
 
     // set the value of dst at the given path and a fieldName
-    for (const auto& token : tokens) {
+    for (const auto& token : tokens)
+    {
         dst->Set(path, token, src.Get(path, token));
     }
 }
@@ -65,7 +66,7 @@ public:
 
 } // namespace
 
-namespace TINKERUSD_NS 
+namespace TINKERUSD_NS
 {
 
 UsdUndoStateDelegate::UsdUndoStateDelegate()
@@ -77,10 +78,7 @@ UsdUndoStateDelegate::UsdUndoStateDelegate()
 
 UsdUndoStateDelegate::~UsdUndoStateDelegate() { }
 
-UsdUndoStateDelegateRefPtr UsdUndoStateDelegate::New()
-{
-    return TfCreateRefPtr(new UsdUndoStateDelegate());
-}
+UsdUndoStateDelegateRefPtr UsdUndoStateDelegate::New() { return TfCreateRefPtr(new UsdUndoStateDelegate()); }
 
 bool UsdUndoStateDelegate::_IsDirty() { return _dirty; }
 
@@ -90,11 +88,13 @@ void UsdUndoStateDelegate::_MarkCurrentStateAsDirty() { _dirty = true; }
 
 void UsdUndoStateDelegate::_OnSetLayer(const SdfLayerHandle& layer)
 {
-    if (layer) {
-        TF_DEBUG(UNDOSTATEDELEGATE)
-            .Msg("Setting Layer '%s' \n", layer->GetDisplayName().c_str());
+    if (layer)
+    {
+        TF_DEBUG(UNDOSTATEDELEGATE).Msg("Setting Layer '%s' \n", layer->GetDisplayName().c_str());
         _layer = layer;
-    } else {
+    }
+    else
+    {
         _layer = nullptr;
     }
 }
@@ -150,8 +150,7 @@ void UsdUndoStateDelegate::invertMoveSpec(const SdfPath& oldPath, const SdfPath&
 {
     _setMessageAlreadyShowed = true;
 
-    TF_DEBUG(UNDOSTATEDELEGATE)
-        .Msg("Inverting move of '%s' to '%s'\n", oldPath.GetText(), newPath.GetText());
+    TF_DEBUG(UNDOSTATEDELEGATE).Msg("Inverting move of '%s' to '%s'\n", oldPath.GetText(), newPath.GetText());
 
     MoveSpec(newPath, oldPath);
 
@@ -238,39 +237,35 @@ void UsdUndoStateDelegate::invertSetFieldDictValueByKey(
     _setMessageAlreadyShowed = false;
 }
 
-void UsdUndoStateDelegate::invertSetTimeSample(
-    const SdfPath& path,
-    double         time,
-    const VtValue& inverse)
+void UsdUndoStateDelegate::invertSetTimeSample(const SdfPath& path, double time, const VtValue& inverse)
 {
     _setMessageAlreadyShowed = true;
 
-    TF_DEBUG(UNDOSTATEDELEGATE)
-        .Msg("Inverting TimeSample '%f' for Spec '%s'\n", time, path.GetText());
+    TF_DEBUG(UNDOSTATEDELEGATE).Msg("Inverting TimeSample '%f' for Spec '%s'\n", time, path.GetText());
 
     SetTimeSample(path, time, inverse);
 
     _setMessageAlreadyShowed = false;
 }
 
-void UsdUndoStateDelegate::_OnSetField(
-    const SdfPath& path,
-    const TfToken& fieldName,
-    const VtValue& value)
+void UsdUndoStateDelegate::_OnSetField(const SdfPath& path, const TfToken& fieldName, const VtValue& value)
 {
     _MarkCurrentStateAsDirty();
 
     // early return if we are not inside an UsdUndoBlock
-    if (UsdUndoBlock::depth() == 0) {
+    if (UsdUndoBlock::depth() == 0)
+    {
         return;
     }
 
-    if (!_setMessageAlreadyShowed) {
+    if (!_setMessageAlreadyShowed)
+    {
         TF_DEBUG(UNDOSTATEDELEGATE)
             .Msg("Setting Field '%s' for Spec '%s'\n", fieldName.GetText(), path.GetText());
     }
 
-    if (!_layer) {
+    if (!_layer)
+    {
         return;
     }
 
@@ -288,16 +283,19 @@ void UsdUndoStateDelegate::_OnSetField(
     _MarkCurrentStateAsDirty();
 
     // early return if we are not inside an UsdUndoBlock
-    if (UsdUndoBlock::depth() == 0) {
+    if (UsdUndoBlock::depth() == 0)
+    {
         return;
     }
 
-    if (!_setMessageAlreadyShowed) {
+    if (!_setMessageAlreadyShowed)
+    {
         TF_DEBUG(UNDOSTATEDELEGATE)
             .Msg("Setting Field '%s' for Spec '%s'\n", fieldName.GetText(), path.GetText());
     }
 
-    if (!_layer) {
+    if (!_layer)
+    {
         return;
     }
 
@@ -344,20 +342,22 @@ void UsdUndoStateDelegate::_OnCreateSpec(const SdfPath& path, SdfSpecType specTy
     _MarkCurrentStateAsDirty();
 
     // early return if we are not inside an UsdUndoBlock
-    if (UsdUndoBlock::depth() == 0) {
+    if (UsdUndoBlock::depth() == 0)
+    {
         return;
     }
 
-    if (!_setMessageAlreadyShowed) {
+    if (!_setMessageAlreadyShowed)
+    {
         TF_DEBUG(UNDOSTATEDELEGATE).Msg("Creating spec at '%s'\n", path.GetText());
     }
 
-    if (!_layer) {
+    if (!_layer)
+    {
         return;
     }
 
-    UsdUndoManagerAccessor::addInverse(
-        std::bind(&UsdUndoStateDelegate::invertCreateSpec, this, path, inert));
+    UsdUndoManagerAccessor::addInverse(std::bind(&UsdUndoStateDelegate::invertCreateSpec, this, path, inert));
 }
 
 void UsdUndoStateDelegate::_OnDeleteSpec(const SdfPath& path, bool inert)
@@ -365,15 +365,18 @@ void UsdUndoStateDelegate::_OnDeleteSpec(const SdfPath& path, bool inert)
     _MarkCurrentStateAsDirty();
 
     // early return if we are not inside an UsdUndoBlock
-    if (UsdUndoBlock::depth() == 0) {
+    if (UsdUndoBlock::depth() == 0)
+    {
         return;
     }
 
-    if (!_setMessageAlreadyShowed) {
+    if (!_setMessageAlreadyShowed)
+    {
         TF_DEBUG(UNDOSTATEDELEGATE).Msg("Deleting spec at '%s'\n", path.GetText());
     }
 
-    if (!_layer) {
+    if (!_layer)
+    {
         return;
     }
 
@@ -388,8 +391,8 @@ void UsdUndoStateDelegate::_OnDeleteSpec(const SdfPath& path, bool inert)
 
     const SdfSpecType deletedSpecType = _GetLayer()->GetSpecType(path);
 
-    UsdUndoManagerAccessor::addInverse(std::bind(
-        &UsdUndoStateDelegate::invertDeleteSpec, this, path, inert, deletedSpecType, deletedData));
+    UsdUndoManagerAccessor::addInverse(
+        std::bind(&UsdUndoStateDelegate::invertDeleteSpec, this, path, inert, deletedSpecType, deletedData));
 }
 
 void UsdUndoStateDelegate::_OnMoveSpec(const SdfPath& oldPath, const SdfPath& newPath)
@@ -397,16 +400,19 @@ void UsdUndoStateDelegate::_OnMoveSpec(const SdfPath& oldPath, const SdfPath& ne
     _MarkCurrentStateAsDirty();
 
     // early return if we are not inside an UsdUndoBlock
-    if (UsdUndoBlock::depth() == 0) {
+    if (UsdUndoBlock::depth() == 0)
+    {
         return;
     }
 
-    if (!_setMessageAlreadyShowed) {
+    if (!_setMessageAlreadyShowed)
+    {
         TF_DEBUG(UNDOSTATEDELEGATE)
             .Msg("Moving spec from '%s' to '%s'\n", oldPath.GetText(), newPath.GetText());
     }
 
-    if (!_layer) {
+    if (!_layer)
+    {
         return;
     }
 
@@ -422,16 +428,19 @@ void UsdUndoStateDelegate::_OnPushChild(
     _MarkCurrentStateAsDirty();
 
     // early return if we are not inside an UsdUndoBlock
-    if (UsdUndoBlock::depth() == 0) {
+    if (UsdUndoBlock::depth() == 0)
+    {
         return;
     }
 
-    if (!_setMessageAlreadyShowed) {
+    if (!_setMessageAlreadyShowed)
+    {
         TF_DEBUG(UNDOSTATEDELEGATE)
             .Msg("Pushing field '%s' of '%s'\n", fieldName.GetText(), parentPath.GetText());
     }
 
-    if (!_layer) {
+    if (!_layer)
+    {
         return;
     }
 
@@ -447,16 +456,19 @@ void UsdUndoStateDelegate::_OnPushChild(
     _MarkCurrentStateAsDirty();
 
     // early return if we are not inside an UsdUndoBlock
-    if (UsdUndoBlock::depth() == 0) {
+    if (UsdUndoBlock::depth() == 0)
+    {
         return;
     }
 
-    if (!_setMessageAlreadyShowed) {
+    if (!_setMessageAlreadyShowed)
+    {
         TF_DEBUG(UNDOSTATEDELEGATE)
             .Msg("Pushing field '%s' of '%s'\n", fieldName.GetText(), parentPath.GetText());
     }
 
-    if (!_layer) {
+    if (!_layer)
+    {
         return;
     }
 
@@ -472,21 +484,24 @@ void UsdUndoStateDelegate::_OnPopChild(
     _MarkCurrentStateAsDirty();
 
     // early return if we are not inside an UsdUndoBlock
-    if (UsdUndoBlock::depth() == 0) {
+    if (UsdUndoBlock::depth() == 0)
+    {
         return;
     }
 
-    if (!_setMessageAlreadyShowed) {
+    if (!_setMessageAlreadyShowed)
+    {
         TF_DEBUG(UNDOSTATEDELEGATE)
             .Msg("Poping field '%s' of '%s'\n", fieldName.GetText(), parentPath.GetText());
     }
 
-    if (!_layer) {
+    if (!_layer)
+    {
         return;
     }
 
-    UsdUndoManagerAccessor::addInverse(std::bind(
-        &UsdUndoStateDelegate::invertPopTokenChild, this, parentPath, fieldName, oldValue));
+    UsdUndoManagerAccessor::addInverse(
+        std::bind(&UsdUndoStateDelegate::invertPopTokenChild, this, parentPath, fieldName, oldValue));
 }
 
 void UsdUndoStateDelegate::_OnPopChild(
@@ -497,21 +512,24 @@ void UsdUndoStateDelegate::_OnPopChild(
     _MarkCurrentStateAsDirty();
 
     // early return if we are not inside an UsdUndoBlock
-    if (UsdUndoBlock::depth() == 0) {
+    if (UsdUndoBlock::depth() == 0)
+    {
         return;
     }
 
-    if (!_setMessageAlreadyShowed) {
+    if (!_setMessageAlreadyShowed)
+    {
         TF_DEBUG(UNDOSTATEDELEGATE)
             .Msg("Poping field '%s' of '%s'\n", fieldName.GetText(), parentPath.GetText());
     }
 
-    if (!_layer) {
+    if (!_layer)
+    {
         return;
     }
 
-    UsdUndoManagerAccessor::addInverse(std::bind(
-        &UsdUndoStateDelegate::invertPopPathChild, this, parentPath, fieldName, oldValue));
+    UsdUndoManagerAccessor::addInverse(
+        std::bind(&UsdUndoStateDelegate::invertPopPathChild, this, parentPath, fieldName, oldValue));
 }
 
 void UsdUndoStateDelegate::_OnSetFieldDictValueByKeyImpl(
@@ -522,11 +540,13 @@ void UsdUndoStateDelegate::_OnSetFieldDictValueByKeyImpl(
     _MarkCurrentStateAsDirty();
 
     // early return if we are not inside an UsdUndoBlock
-    if (UsdUndoBlock::depth() == 0) {
+    if (UsdUndoBlock::depth() == 0)
+    {
         return;
     }
 
-    if (!_setMessageAlreadyShowed) {
+    if (!_setMessageAlreadyShowed)
+    {
         TF_DEBUG(UNDOSTATEDELEGATE)
             .Msg(
                 "Setting field '%s' by key '%s' for spec '%s'\n",
@@ -535,19 +555,15 @@ void UsdUndoStateDelegate::_OnSetFieldDictValueByKeyImpl(
                 path.GetText());
     }
 
-    if (!_layer) {
+    if (!_layer)
+    {
         return;
     }
 
     const VtValue inverseValue = _layer->GetFieldDictValueByKey(path, fieldName, keyPath);
 
     UsdUndoManagerAccessor::addInverse(std::bind(
-        &UsdUndoStateDelegate::invertSetFieldDictValueByKey,
-        this,
-        path,
-        fieldName,
-        keyPath,
-        inverseValue));
+        &UsdUndoStateDelegate::invertSetFieldDictValueByKey, this, path, fieldName, keyPath, inverseValue));
 }
 
 void UsdUndoStateDelegate::_OnSetTimeSampleImpl(const SdfPath& path, double time)
@@ -555,22 +571,20 @@ void UsdUndoStateDelegate::_OnSetTimeSampleImpl(const SdfPath& path, double time
     _MarkCurrentStateAsDirty();
 
     // early return if we are not inside an UsdUndoBlock
-    if (UsdUndoBlock::depth() == 0) {
+    if (UsdUndoBlock::depth() == 0)
+    {
         return;
     }
 
-    TF_DEBUG(UNDOSTATEDELEGATE)
-        .Msg("Setting time sample '%f' for spec '%s'\n", time, path.GetText());
+    TF_DEBUG(UNDOSTATEDELEGATE).Msg("Setting time sample '%f' for spec '%s'\n", time, path.GetText());
 
-    if (!_GetLayer()->HasField(path, SdfFieldKeys->TimeSamples)) {
+    if (!_GetLayer()->HasField(path, SdfFieldKeys->TimeSamples))
+    {
         UsdUndoManagerAccessor::addInverse(std::bind(
-            &UsdUndoStateDelegate::invertSetField,
-            this,
-            path,
-            SdfFieldKeys->TimeSamples,
-            VtValue()));
-
-    } else {
+            &UsdUndoStateDelegate::invertSetField, this, path, SdfFieldKeys->TimeSamples, VtValue()));
+    }
+    else
+    {
         VtValue oldValue;
 
         _GetLayer()->QueryTimeSample(path, time, &oldValue);
@@ -593,10 +607,7 @@ void UsdUndoStateDelegate::_OnSetTimeSampleImpl(const SdfPath& path, double time
 // _PopChild is the customized version of SdfLayer::_PrimPopChild where the oldValue is properly
 // removed from the container.
 template <class T>
-void UsdUndoStateDelegate::_PopChild(
-    const SdfPath& parentPath,
-    const TfToken& fieldName,
-    const T&       oldValue)
+void UsdUndoStateDelegate::_PopChild(const SdfPath& parentPath, const TfToken& fieldName, const T& oldValue)
 {
     // capture pop child
     _OnPopChild(parentPath, fieldName, oldValue);
@@ -607,7 +618,8 @@ void UsdUndoStateDelegate::_PopChild(
     // See efficiency notes in _PrimPushChild().
     VtValue box = data->Get(parentPath, fieldName);
     data->Erase(parentPath, fieldName);
-    if (!box.IsHolding<std::vector<T>>()) {
+    if (!box.IsHolding<std::vector<T>>())
+    {
         TF_CODING_ERROR(
             "SdfLayer::_PrimPopChild failed: field %s is "
             "non-vector",
@@ -616,7 +628,8 @@ void UsdUndoStateDelegate::_PopChild(
     }
     std::vector<T> vec;
     box.Swap(vec);
-    if (vec.empty()) {
+    if (vec.empty())
+    {
         TF_CODING_ERROR("SdfLayer::_PrimPopChild failed: %s is empty", fieldName.GetText());
         return;
     }

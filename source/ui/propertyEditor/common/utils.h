@@ -2,6 +2,10 @@
 
 #include "valueEditors/abstractPropertyEditor.h"
 
+#include <QModelIndex>
+#include <QSortFilterProxyModel>
+#include <QString>
+#include <QVariant>
 #include <optional>
 #include <pxr/base/tf/diagnostic.h>
 #include <pxr/base/tf/token.h>
@@ -11,11 +15,6 @@
 #include <pxr/usd/sdf/types.h>
 #include <pxr/usd/usd/attribute.h>
 #include <pxr/usd/usd/prim.h>
-#include <QModelIndex>
-#include <QSortFilterProxyModel>
-#include <QString>
-#include <QVariant>
-
 #include <string_view>
 
 PXR_NAMESPACE_USING_DIRECTIVE

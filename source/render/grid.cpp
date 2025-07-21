@@ -1,13 +1,13 @@
 #include "grid.h"
+
 #include "camera/usdCamera.h"
 
 #include <QOpenGLShaderProgram>
-
 #include <pxr/base/gf/matrix4f.h>
 
-namespace 
+namespace
 {
-    const char* vertexShaderSrc = R"(
+const char* vertexShaderSrc = R"(
         #version 450 core
         layout(location = 0) in vec3 aPos;
         uniform mat4 uViewMatrix;
@@ -17,7 +17,7 @@ namespace
         }
     )";
 
-    const char* fragmentShaderSrc = R"(
+const char* fragmentShaderSrc = R"(
         #version 450 core
         uniform vec4 uColor;
         out vec4 FragColor;
@@ -27,34 +27,37 @@ namespace
     )";
 } // namespace
 
-namespace TINKERUSD_NS 
+namespace TINKERUSD_NS
 {
 
 Grid::Grid()
-    : m_vao( 0 )
-    , m_vbo( 0 )
-    , m_shaderProgram( 0 )
-    , m_size( 30.0f )
-    , m_cellCount( 30 )
-    , m_baseLinesColor( QColor(124, 124, 124) )
-    , m_majorLinesColor( QColor(180, 210, 234) )
+    : m_vao(0)
+    , m_vbo(0)
+    , m_shaderProgram(0)
+    , m_size(30.0f)
+    , m_cellCount(30)
+    , m_baseLinesColor(QColor(124, 124, 124))
+    , m_majorLinesColor(QColor(180, 210, 234))
 {
 }
 
-Grid::~Grid() 
+Grid::~Grid()
 {
-    if (m_vao) {
+    if (m_vao)
+    {
         glDeleteVertexArrays(1, &m_vao);
     }
-    if (m_vbo) {
+    if (m_vbo)
+    {
         glDeleteBuffers(1, &m_vbo);
     }
-    if (m_shaderProgram) {
+    if (m_shaderProgram)
+    {
         glDeleteProgram(m_shaderProgram);
     }
 }
 
-void Grid::initialize() 
+void Grid::initialize()
 {
     initializeOpenGLFunctions();
     setupShader();
@@ -63,7 +66,7 @@ void Grid::initialize()
     glGenBuffers(1, &m_vbo);
 }
 
-void Grid::setupShader() 
+void Grid::setupShader()
 {
     GLuint vert = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vert, 1, &vertexShaderSrc, nullptr);
@@ -82,42 +85,46 @@ void Grid::setupShader()
     glDeleteShader(frag);
 }
 
-void Grid::draw(const UsdCamera* camera, const TfToken& upAxis) 
+void Grid::draw(const UsdCamera* camera, const TfToken& upAxis)
 {
-    if (!camera){
-      return;  
-    } 
+    if (!camera)
+    {
+        return;
+    }
 
     std::vector<GLfloat> baseLines;
     std::vector<GLfloat> majorLines;
 
     const float extent = m_size * m_cellCount;
-    const bool yUp = (upAxis == TfToken("Y"));
-    const bool zUp = (upAxis == TfToken("Z"));
-    const bool xUp = (upAxis == TfToken("X"));
+    const bool  yUp = (upAxis == TfToken("Y"));
+    const bool  zUp = (upAxis == TfToken("Z"));
+    const bool  xUp = (upAxis == TfToken("X"));
 
-    for (auto i = -m_cellCount; i <= m_cellCount; ++i) {
+    for (auto i = -m_cellCount; i <= m_cellCount; ++i)
+    {
         float pos = i * m_size;
         // TODO: hight every 10th row for now
         bool isHighlight = (i % 10 == 0);
 
         auto& target = isHighlight ? majorLines : baseLines;
 
-        if (yUp) {
-            target.insert(target.end(), {
-                pos, 0.0f, -extent, pos, 0.0f, extent,
-                -extent, 0.0f, pos, extent, 0.0f, pos
-            });
-        } else if (zUp) {
-            target.insert(target.end(), {
-                pos, -extent, 0.0f, pos, extent, 0.0f,
-                -extent, pos, 0.0f, extent, pos, 0.0f
-            });
-        } else if (xUp) {
-            target.insert(target.end(), {
-                0.0f, pos, -extent, 0.0f, pos, extent,
-                0.0f, -extent, pos, 0.0f, extent, pos
-            });
+        if (yUp)
+        {
+            target.insert(
+                target.end(),
+                { pos, 0.0f, -extent, pos, 0.0f, extent, -extent, 0.0f, pos, extent, 0.0f, pos });
+        }
+        else if (zUp)
+        {
+            target.insert(
+                target.end(),
+                { pos, -extent, 0.0f, pos, extent, 0.0f, -extent, pos, 0.0f, extent, pos, 0.0f });
+        }
+        else if (xUp)
+        {
+            target.insert(
+                target.end(),
+                { 0.0f, pos, -extent, 0.0f, pos, extent, 0.0f, -extent, pos, 0.0f, extent, pos });
         }
     }
 
@@ -134,11 +141,17 @@ void Grid::draw(const UsdCamera* camera, const TfToken& upAxis)
         GfMatrix4f viewMatrix(camera->getViewMatrix());
         GfMatrix4f projMatrix(camera->getProjectionMatrix());
 
-        glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uViewMatrix"), 1, GL_FALSE, viewMatrix.data());
-        glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uProjectionMatrix"), 1, GL_FALSE, projMatrix.data());
+        glUniformMatrix4fv(
+            glGetUniformLocation(m_shaderProgram, "uViewMatrix"), 1, GL_FALSE, viewMatrix.data());
+        glUniformMatrix4fv(
+            glGetUniformLocation(m_shaderProgram, "uProjectionMatrix"), 1, GL_FALSE, projMatrix.data());
 
-        glUniform4f(glGetUniformLocation(m_shaderProgram, "uColor"),
-                    color.redF(), color.greenF(), color.blueF(), 1.0f);
+        glUniform4f(
+            glGetUniformLocation(m_shaderProgram, "uColor"),
+            color.redF(),
+            color.greenF(),
+            color.blueF(),
+            1.0f);
 
         glDrawArrays(GL_LINES, 0, lines.size() / 3);
     };
@@ -150,23 +163,11 @@ void Grid::draw(const UsdCamera* camera, const TfToken& upAxis)
     glUseProgram(0);
 }
 
-void Grid::setSize(float size) 
-{ 
-    m_size = size; 
-}
-void Grid::setCellCount(int count) 
-{ 
-    m_cellCount = count; 
-}
+void Grid::setSize(float size) { m_size = size; }
+void Grid::setCellCount(int count) { m_cellCount = count; }
 
-void Grid::setBaseLinesColor(const QColor& color) 
-{ 
-    m_baseLinesColor = color; 
-}
+void Grid::setBaseLinesColor(const QColor& color) { m_baseLinesColor = color; }
 
-void Grid::setMajorLinesColor(const QColor& color)
-{
-    m_majorLinesColor = color;
-}
+void Grid::setMajorLinesColor(const QColor& color) { m_majorLinesColor = color; }
 
 } // namespace TINKERUSD_NS

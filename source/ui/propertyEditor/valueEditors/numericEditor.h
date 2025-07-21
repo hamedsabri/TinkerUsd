@@ -1,59 +1,52 @@
 #pragma once
 
-#include "abstractPropertyEditor.h"
-#include "customWidgets/incrementalSlider.h"
+#ifndef TINKERUSD_NUMERIC_EDITOR_H
+#define TINKERUSD_NUMERIC_EDITOR_H
 
+#include "abstractPropertyEditor.h"
+#include "customWidgets/numericWidgets.h"
+
+#include <QVBoxLayout>
 #include <QtCore/QPair>
 
 namespace TINKERUSD_NS
 {
 
-/**
- * @class AbstractSliderGroupWidget
- * @brief A base class for slider group widgets that provides common functionality such as signals and slots.
- *
- * This class cannot directly mix Q_OBJECT with templates, hence it serves as a common 
- * interface for derived template-based slider widgets.
- */
 class AbstractSliderGroupWidget : public QWidget
 {
     Q_OBJECT
 public:
-    AbstractSliderGroupWidget(QWidget *parent = nullptr) : QWidget(parent) {}
-
+    AbstractSliderGroupWidget(QWidget* parent = nullptr)
+        : QWidget(parent)
+    {
+    }
     virtual ~AbstractSliderGroupWidget() = default;
 
-    // returns the current value.
     virtual QVariant getValue() const = 0;
-
-    // set the current value.
-    virtual void setValue(const QVariant& value) = 0;
+    virtual void     setValue(const QVariant& value) = 0;
 
 signals:
-    // signal emitted when the data needs to be committed.
     void commitData();
 
-public slots:
-    // slot called when the value entry changes, emitting commitData signal.
+protected slots:
     void onValueEntryChanged() { emit commitData(); }
-
-    // slot called when the slider value changes, emitting commitData signal.
     void onSliderChanged() { emit commitData(); }
 };
 
-/**
- * @struct NumericGroupSliderData
- * @brief A structure to hold data for numeric group sliders.
- */
-template<typename T>
-struct NumericGroupSliderData 
+template <typename T> struct NumericGroupSliderData
 {
     QPair<T, T> m_range;
-    T m_defaultValue;
+    T           m_defaultValue;
 
-    NumericGroupSliderData() : m_defaultValue(0) {}
-    NumericGroupSliderData(const QPair<T, T>& range, T defaultValue) 
-        : m_range(range), m_defaultValue(defaultValue) {}
+    NumericGroupSliderData()
+        : m_defaultValue(T(0))
+    {
+    }
+    NumericGroupSliderData(const QPair<T, T>& range, T defaultValue)
+        : m_range(range)
+        , m_defaultValue(defaultValue)
+    {
+    }
 };
 
 Q_DECLARE_METATYPE(TINKERUSD_NS::NumericGroupSliderData<int32_t>)
@@ -61,83 +54,97 @@ Q_DECLARE_METATYPE(TINKERUSD_NS::NumericGroupSliderData<uint32_t>)
 Q_DECLARE_METATYPE(TINKERUSD_NS::NumericGroupSliderData<float>)
 Q_DECLARE_METATYPE(TINKERUSD_NS::NumericGroupSliderData<double>)
 
-/**
- * @class NumericSliderGroupWidget
- * @brief A template-based widget for a numeric slider group.
- * 
- */
-template<typename T>
-class NumericSliderGroupWidget : public AbstractSliderGroupWidget
+template <typename T> class NumericSliderGroupWidget : public AbstractSliderGroupWidget
 {
 public:
-    using SliderGroupType = typename std::conditional<std::disjunction<std::is_same<T, int32_t>,
-                                                      std::is_same<T, uint32_t>>::value,
-                                                      IntSliderGroup,
-                                                      FloatSliderGroup>::type;
-    
-    NumericSliderGroupWidget(QWidget *parent = nullptr);
+    NumericSliderGroupWidget(QWidget* parent = nullptr)
+        : AbstractSliderGroupWidget(parent)
+        , m_sliderGroup(new SliderGroup<T>(parent))
+    {
+        QVBoxLayout* layout = new QVBoxLayout(this);
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->addWidget(m_sliderGroup);
 
-    virtual ~NumericSliderGroupWidget() = default;
+        connect(
+            m_sliderGroup, &SliderGroupBase::sliderMoved, this, &NumericSliderGroupWidget::onSliderChanged);
+        connect(
+            m_sliderGroup,
+            &SliderGroupBase::valueUpdated,
+            this,
+            &NumericSliderGroupWidget::onValueEntryChanged);
+    }
 
-    // returns the current value of the slider as a QVariant.
-    QVariant getValue() const override;
+    QVariant getValue() const override { return QVariant::fromValue(m_sliderGroup->valueEntry()->value()); }
 
-    // sets the current value.
-    void setValue(const QVariant& value) override;
+    void setValue(const QVariant& value) override { m_sliderGroup->setValue(value); }
 
-    // sets the range
-    void setRange(const QPair<T, T>& range);
+    void setRange(const QPair<T, T>& range) { m_sliderGroup->setRange(range.first, range.second); }
 
 private:
-    // HS TODO: this conditional type-trait can go away once the custom widget slider/number-line
-    // are templated.
-    SliderGroupType* m_sliderGroup;
+    SliderGroup<T>* m_sliderGroup;
 };
 
-/**
- * @class NumericEditor
- * @brief A template-based property editor for numeric values.
- * 
- */
-template<typename T>
-class NumericEditor : public AbstractPropertyEditor
+template <typename T> class NumericEditor : public AbstractPropertyEditor
 {
 public:
-    
-    NumericEditor(const QString &name, 
-                  const NumericGroupSliderData<T>& groupSliderData, 
-                  const QString &tooltip = QString());
+    NumericEditor(
+        const QString&                   name,
+        const NumericGroupSliderData<T>& groupSliderData,
+        const QString&                   tooltip = QString())
+        : AbstractPropertyEditor(name, QVariant::fromValue(groupSliderData.m_defaultValue), tooltip)
+        , m_range(groupSliderData.m_range)
+    {
+    }
 
-    
-    virtual ~NumericEditor() = default;
+    PXR_NS::VtValue toVtValue(const QVariant& value) const override
+    {
+        if (value.canConvert<T>())
+            return PXR_NS::VtValue(value.value<T>());
+        return PXR_NS::VtValue();
+    }
 
-    // converts a QVariant value to a VtValue.
-    PXR_NS::VtValue toVtValue(const QVariant& value) const override;
+    QVariant fromVtValue(const PXR_NS::VtValue& value) const override
+    {
+        if (value.IsHolding<T>())
+            return QVariant(value.Get<T>());
+        return QVariant();
+    }
 
-    // converts a VtValue to a QVariant.
-    QVariant fromVtValue(const PXR_NS::VtValue& value) const override;
+    QWidget* createEditor(QWidget* parent) const override
+    {
+        NumericSliderGroupWidget<T>* widget = new NumericSliderGroupWidget<T>(parent);
+        widget->setRange(m_range);
+        widget->setValue(currentValue());
+        return widget;
+    }
 
-    // creates an editor widget for the property.
-    QWidget* createEditor(QWidget* parent) const override;
+    void setEditorData(QWidget* editor, const QVariant& data) const override
+    {
+        if (auto* widget = dynamic_cast<AbstractSliderGroupWidget*>(editor))
+            widget->setValue(data);
+    }
 
-    // sets the data in the editor widget.
-    void setEditorData(QWidget* editor, const QVariant& data) const override;
-
-    // returns the data from the editor widget.
-    QVariant editorData(QWidget* editor) const override;
+    QVariant editorData(QWidget* editor) const override
+    {
+        if (auto* widget = dynamic_cast<AbstractSliderGroupWidget*>(editor))
+            return widget->getValue();
+        return QVariant();
+    }
 
 private:
     QPair<T, T> m_range;
 };
 
-using IntegerGroupSliderData         = NumericGroupSliderData<int32_t>;
+using IntegerGroupSliderData = NumericGroupSliderData<int32_t>;
 using UnsignedIntegerGroupSliderData = NumericGroupSliderData<uint32_t>;
-using FloatGroupSliderData           = NumericGroupSliderData<float>;
-using DoubleGroupSliderData          = NumericGroupSliderData<double>;
+using FloatGroupSliderData = NumericGroupSliderData<float>;
+using DoubleGroupSliderData = NumericGroupSliderData<double>;
 
-using IntegerEditor                  = NumericEditor<int32_t>;
-using UnsignedIntegerEditor          = NumericEditor<uint32_t>;
-using FloatEditor                    = NumericEditor<float>;
-using DoubleEditor                   = NumericEditor<double>;
+using IntegerEditor = NumericEditor<int32_t>;
+using UnsignedIntegerEditor = NumericEditor<uint32_t>;
+using FloatEditor = NumericEditor<float>;
+using DoubleEditor = NumericEditor<double>;
 
 } // namespace TINKERUSD_NS
+
+#endif // TINKERUSD_NUMERIC_EDITOR_H

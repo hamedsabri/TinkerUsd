@@ -25,14 +25,14 @@ UsdOutlinerFilterProxyModel::UsdOutlinerFilterProxyModel(QObject* parent)
 
 void UsdOutlinerFilterProxyModel::setFilterPattern(const QString& pattern)
 {
-    if (m_filterPattern != pattern) {
+    if (m_filterPattern != pattern)
+    {
         m_filterPattern = pattern;
         invalidateFilter();
     }
 }
 
-bool UsdOutlinerFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent)
-    const
+bool UsdOutlinerFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
 {
     if (m_filterPattern.isEmpty())
     {
@@ -74,26 +74,31 @@ void UsdOutlinerModel::setStage(const UsdStageRefPtr& stage)
 
 QModelIndex UsdOutlinerModel::index(int row, int column, const QModelIndex& parent) const
 {
-    if (!m_rootItem || row < 0 || column < 0 || column >= 3) {
+    if (!m_rootItem || row < 0 || column < 0 || column >= 3)
+    {
         return {};
     }
 
     UsdOutlinerItem::Ptr parentItem;
 
-    if (!parent.isValid()) {
+    if (!parent.isValid())
+    {
         parentItem = m_rootItem;
     }
-    else {
+    else
+    {
         auto* rawItem = static_cast<UsdOutlinerItem*>(parent.internalPointer());
         parentItem = rawItem ? rawItem->shared_from_this() : nullptr;
     }
 
-    if (!parentItem) {
+    if (!parentItem)
+    {
         return {};
     }
 
     UsdOutlinerItem::Ptr childItem = parentItem->child(row);
-    if (!childItem) {
+    if (!childItem)
+    {
         return {};
     }
 
@@ -102,19 +107,22 @@ QModelIndex UsdOutlinerModel::index(int row, int column, const QModelIndex& pare
 
 QModelIndex UsdOutlinerModel::parent(const QModelIndex& child) const
 {
-    if (!child.isValid()) {
+    if (!child.isValid())
+    {
         return {};
     }
 
     auto* childItemRaw = static_cast<UsdOutlinerItem*>(child.internalPointer());
-    if (!childItemRaw) {
+    if (!childItemRaw)
+    {
         return {};
     }
 
     UsdOutlinerItem::Ptr childItem = childItemRaw->shared_from_this();
     UsdOutlinerItem::Ptr parentItem = childItem->parentItem();
 
-    if (!parentItem || parentItem == m_rootItem) {
+    if (!parentItem || parentItem == m_rootItem)
+    {
         return {};
     }
 
@@ -123,7 +131,8 @@ QModelIndex UsdOutlinerModel::parent(const QModelIndex& child) const
 
 int UsdOutlinerModel::rowCount(const QModelIndex& parent) const
 {
-    if (!m_stage || !m_rootItem) {
+    if (!m_stage || !m_rootItem)
+    {
         return 0;
     }
 
@@ -146,12 +155,14 @@ int UsdOutlinerModel::columnCount(const QModelIndex&) const { return 3; }
 
 QVariant UsdOutlinerModel::data(const QModelIndex& index, int role) const
 {
-    if (!index.isValid() || role != Qt::DisplayRole) {
+    if (!index.isValid() || role != Qt::DisplayRole)
+    {
         return {};
     }
 
     auto* itemRaw = static_cast<UsdOutlinerItem*>(index.internalPointer());
-    if (!itemRaw) {
+    if (!itemRaw)
+    {
         return {};
     }
 
@@ -174,7 +185,8 @@ QVariant UsdOutlinerModel::data(const QModelIndex& index, int role) const
 
 QVariant UsdOutlinerModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (orientation != Qt::Horizontal || role != Qt::DisplayRole) {
+    if (orientation != Qt::Horizontal || role != Qt::DisplayRole)
+    {
         return {};
     }
 
@@ -189,12 +201,14 @@ QVariant UsdOutlinerModel::headerData(int section, Qt::Orientation orientation, 
 
 UsdPrim UsdOutlinerModel::primFromIndex(const QModelIndex& index) const
 {
-    if (!index.isValid()) {
+    if (!index.isValid())
+    {
         return UsdPrim();
     }
 
     auto* itemRaw = static_cast<UsdOutlinerItem*>(index.internalPointer());
-    if (!itemRaw) {
+    if (!itemRaw)
+    {
         return UsdPrim();
     }
 
@@ -206,18 +220,22 @@ QModelIndex UsdOutlinerModel::indexFromPrim(const UsdPrim& targetPrim) const
 {
     std::function<QModelIndex(UsdOutlinerItem::Ptr)> findIndex;
     findIndex = [&](UsdOutlinerItem::Ptr item) -> QModelIndex {
-        if (!item) {
+        if (!item)
+        {
             return {};
         }
 
-        if (item->prim() == targetPrim) {
+        if (item->prim() == targetPrim)
+        {
             return createIndex(item->row(), 0, item.get());
         }
 
         item->fetchChildrenIfNeeded();
-        for (int i = 0; i < item->childCount(); ++i) {
+        for (int i = 0; i < item->childCount(); ++i)
+        {
             auto index = findIndex(item->child(i));
-            if (index.isValid()) {
+            if (index.isValid())
+            {
                 return index;
             }
         }

@@ -17,7 +17,6 @@
 #pragma once
 
 #include "core/utils.h"
-
 #include "usdUndoManager.h"
 #include "usdUndoableItem.h"
 
@@ -25,7 +24,7 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace TINKERUSD_NS 
+namespace TINKERUSD_NS
 {
 
 TF_DECLARE_WEAK_AND_REF_PTRS(UsdUndoManager);

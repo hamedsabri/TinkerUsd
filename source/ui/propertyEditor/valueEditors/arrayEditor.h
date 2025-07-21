@@ -2,6 +2,7 @@
 
 #include "abstractPropertyEditor.h"
 
+#include <concepts>
 #include <pxr/base/gf/matrix2d.h>
 #include <pxr/base/gf/matrix3d.h>
 #include <pxr/base/gf/matrix4d.h>
@@ -11,12 +12,10 @@
 #include <pxr/base/vt/array.h>
 #include <pxr/base/vt/value.h>
 
-#include <concepts>
-
-namespace TINKERUSD_NS 
+namespace TINKERUSD_NS
 {
 
-template<typename T>
+template <typename T>
 concept FundamentalType = std::is_fundamental_v<T>;
 
 // registering VtArray types. add more types here as needed...
@@ -39,20 +38,24 @@ Q_DECLARE_METATYPE(PXR_NS::VtArray<PXR_NS::TfToken>)
 
 /**
  * @class ArrayEditorWidgetBase
- * @brief A base class for ArrayEditorWidget that provides common functionality such as signals and slots.
-*
- * This class cannot directly mix Q_OBJECT with templates, hence it serves as a common 
+ * @brief A base class for ArrayEditorWidget that provides common functionality such as signals and
+ * slots.
+ *
+ * This class cannot directly mix Q_OBJECT with templates, hence it serves as a common
  * interface for derived template-based widget.
  */
 class ArrayEditorWidgetBase : public QWidget
 {
     Q_OBJECT
 public:
-    ArrayEditorWidgetBase(QWidget* parent) : QWidget(parent) {}
+    ArrayEditorWidgetBase(QWidget* parent)
+        : QWidget(parent)
+    {
+    }
     virtual ~ArrayEditorWidgetBase() = default;
 
     virtual QVariant arrayData() const = 0;
-    virtual void setArrayData(const QVariant& data) = 0;
+    virtual void     setArrayData(const QVariant& data) = 0;
 
 signals:
     // signal emitted when the data should be committed.
@@ -62,16 +65,14 @@ signals:
 /**
  * @class ArrayEditorWidget
  * @brief A template-based widget for displaying VtArray types.
- * 
+ *
  */
-template<typename T>
-class ArrayEditorWidget : public ArrayEditorWidgetBase
+template <typename T> class ArrayEditorWidget : public ArrayEditorWidgetBase
 {
     using ParamType = std::conditional_t<FundamentalType<T>, T, const T&>;
+
 public:
-    ArrayEditorWidget(QWidget* parent, 
-                      const PXR_NS::VtArray<T>& array, 
-                      const QString& typeName);
+    ArrayEditorWidget(QWidget* parent, const PXR_NS::VtArray<T>& array, const QString& typeName);
 
     virtual ~ArrayEditorWidget() = default;
 
@@ -87,9 +88,9 @@ public:
 private:
     QString displayData(const PXR_NS::VtArray<T>& array) const;
 
-    PXR_NS::VtArray<T>  m_array;
-    QLineEdit*          m_lineEdit;
-    QString             m_typeDisplayName;
+    PXR_NS::VtArray<T> m_array;
+    QLineEdit*         m_lineEdit;
+    QString            m_typeDisplayName;
 };
 
 /**
@@ -100,10 +101,10 @@ private:
 class ArrayEditorBase : public AbstractPropertyEditor
 {
 public:
-    ArrayEditorBase(const QString& name,
-                    const QVariant& currentValue,
-                    const QString& tooltip)
-        : AbstractPropertyEditor(name, currentValue, tooltip) {}
+    ArrayEditorBase(const QString& name, const QVariant& currentValue, const QString& tooltip)
+        : AbstractPropertyEditor(name, currentValue, tooltip)
+    {
+    }
     virtual ~ArrayEditorBase() = default;
 
     // returns the raw array value as a string
@@ -113,15 +114,16 @@ public:
 /**
  * @class ArrayEditor
  * @brief A template-based array editor for specific VtArray types.
- * 
+ *
  */
-template<typename T>
-class ArrayEditor : public ArrayEditorBase
+template <typename T> class ArrayEditor : public ArrayEditorBase
 {
 public:
-    ArrayEditor(const QString& name,
-                const PXR_NS::VtArray<T>& value, 
-                const QString& tooltip, const QString& typeName);
+    ArrayEditor(
+        const QString&            name,
+        const PXR_NS::VtArray<T>& value,
+        const QString&            tooltip,
+        const QString&            typeName);
 
     virtual ~ArrayEditor() = default;
 
@@ -144,9 +146,9 @@ public:
     QVariant editorData(QWidget* editor) const override;
 
 private:
-    PXR_NS::VtArray<T>             m_vtArray;
-    QString                        m_typeDisplayName;
-    mutable ArrayEditorWidget<T>*  m_arrayEditorWidget;
+    PXR_NS::VtArray<T>            m_vtArray;
+    QString                       m_typeDisplayName;
+    mutable ArrayEditorWidget<T>* m_arrayEditorWidget;
 };
 
 } // namespace TINKERUSD_NS

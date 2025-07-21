@@ -14,16 +14,12 @@ PropertyComboBoxWidget::PropertyComboBoxWidget(QWidget* parent)
     layout->addWidget(m_comboBox);
     setLayout(layout);
 
-    connect(m_comboBox, static_cast<void (NoWheelComboBox::*)(const QString&)>
-        (&NoWheelComboBox::currentTextChanged),
-        [=](const QString&) {
-            emit commitData();
-        });
+    connect(
+        m_comboBox,
+        static_cast<void (NoWheelComboBox::*)(const QString&)>(&NoWheelComboBox::currentTextChanged),
+        [=](const QString&) { emit commitData(); });
 }
 
-NoWheelComboBox* PropertyComboBoxWidget::comboBox() const
-{
-    return m_comboBox;
-}
+NoWheelComboBox* PropertyComboBoxWidget::comboBox() const { return m_comboBox; }
 
 } // namespace TINKERUSD_NS

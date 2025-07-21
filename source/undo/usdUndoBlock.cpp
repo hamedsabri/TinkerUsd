@@ -15,9 +15,10 @@
 //
 
 #include "usdUndoBlock.h"
+
 #include "debugCodes.h"
 
-namespace TINKERUSD_NS 
+namespace TINKERUSD_NS
 {
 
 uint32_t UsdUndoBlock::_undoBlockDepth { 0 };
@@ -38,7 +39,8 @@ UsdUndoBlock::~UsdUndoBlock()
     // decrease the depth
     --_undoBlockDepth;
 
-    if ((nullptr != _undoItem) && (_undoBlockDepth == 0)) {
+    if ((nullptr != _undoItem) && (_undoBlockDepth == 0))
+    {
         // transfer edits
         UsdUndoManagerAccessor::transferEdits(*_undoItem, _extraEdits);
 

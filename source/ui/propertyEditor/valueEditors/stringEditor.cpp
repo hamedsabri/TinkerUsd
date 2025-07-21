@@ -4,13 +4,15 @@
 
 namespace
 {
-    // HS TODO: handle long chars properly
-    QString checkLength(const QString& txt) {
-        if (txt.length() <= 200) {
-            return txt.simplified();
-        }
-        return QString("Long String is not supported yet!");
+// HS TODO: handle long chars properly
+QString checkLength(const QString& txt)
+{
+    if (txt.length() <= 200)
+    {
+        return txt.simplified();
     }
+    return QString("Long String is not supported yet!");
+}
 } // namespace
 
 namespace TINKERUSD_NS
@@ -26,29 +28,18 @@ PropertyStringWidget::PropertyStringWidget(QWidget* parent)
     setLayout(layout);
 
     // send commitData signal whenever the user finishes editing the text in the line edit
-    connect(m_lineEdit, &QLineEdit::editingFinished, this, [=]() {
-        Q_EMIT commitData();
-    });
+    connect(m_lineEdit, &QLineEdit::editingFinished, this, [=]() { Q_EMIT commitData(); });
 }
 
-QString PropertyStringWidget::text() const
-{
-    return m_lineEdit->text();
-}
+QString PropertyStringWidget::text() const { return m_lineEdit->text(); }
 
-void PropertyStringWidget::setText(const QString& text)
-{
-    m_lineEdit->setText(text);
-}
+void PropertyStringWidget::setText(const QString& text) { m_lineEdit->setText(text); }
 
-void PropertyStringWidget::setEditable(bool editable)
-{
-    m_lineEdit->setReadOnly(!editable);
-}
+void PropertyStringWidget::setEditable(bool editable) { m_lineEdit->setReadOnly(!editable); }
 
-StringEditor::StringEditor(const QString &name, const StringData& value, const QString &tooltip)
+StringEditor::StringEditor(const QString& name, const StringData& value, const QString& tooltip)
     : AbstractPropertyEditor(name, checkLength(value.m_value), tooltip)
-    , m_editable( value.m_editable )
+    , m_editable(value.m_editable)
 {
 }
 
@@ -67,7 +58,8 @@ PXR_NS::VtValue StringEditor::toVtValue(const QVariant& value) const
 
 QVariant StringEditor::fromVtValue(const PXR_NS::VtValue& value) const
 {
-    if (value.IsHolding<std::string>()) {
+    if (value.IsHolding<std::string>())
+    {
         return QVariant(QString::fromStdString(value.Get<std::string>()));
     }
     return QVariant();
@@ -76,7 +68,8 @@ QVariant StringEditor::fromVtValue(const PXR_NS::VtValue& value) const
 void StringEditor::setEditorData(QWidget* editor, const QVariant& data) const
 {
     PropertyStringWidget* propertyStringWidget = qobject_cast<PropertyStringWidget*>(editor);
-    if (propertyStringWidget) {
+    if (propertyStringWidget)
+    {
         propertyStringWidget->setText(data.toString());
     }
 }
@@ -84,7 +77,8 @@ void StringEditor::setEditorData(QWidget* editor, const QVariant& data) const
 QVariant StringEditor::editorData(QWidget* editor) const
 {
     PropertyStringWidget* propertyStringWidget = qobject_cast<PropertyStringWidget*>(editor);
-    if (propertyStringWidget) {
+    if (propertyStringWidget)
+    {
         return propertyStringWidget->text();
     }
     return QVariant();

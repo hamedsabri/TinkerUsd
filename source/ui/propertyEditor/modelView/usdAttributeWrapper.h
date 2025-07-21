@@ -1,10 +1,8 @@
 #pragma once
 
-#include <pxr/usd/usd/attribute.h>
-
 #include <QtCore/QString>
-
 #include <memory>
+#include <pxr/usd/usd/attribute.h>
 
 namespace TINKERUSD_NS
 {
@@ -28,12 +26,10 @@ public:
     static Ptr create(const PXR_NS::UsdAttribute& usdAttr);
 
     //! retrieves the value of the USD attribute at a specific time code.
-    bool
-    get(PXR_NS::VtValue& value, PXR_NS::UsdTimeCode time = PXR_NS::UsdTimeCode::Default()) const;
+    bool get(PXR_NS::VtValue& value, PXR_NS::UsdTimeCode time = PXR_NS::UsdTimeCode::Default()) const;
 
     //! sets the value of the USD attribute at a specific time code.
-    bool
-    set(const PXR_NS::VtValue& value, PXR_NS::UsdTimeCode time = PXR_NS::UsdTimeCode::Default());
+    bool set(const PXR_NS::VtValue& value, PXR_NS::UsdTimeCode time = PXR_NS::UsdTimeCode::Default());
 
     //! checks whether the USD attribute has authored data.
     bool isAuthored() const;

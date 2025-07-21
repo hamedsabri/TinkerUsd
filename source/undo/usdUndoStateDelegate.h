@@ -22,7 +22,7 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace TINKERUSD_NS 
+namespace TINKERUSD_NS
 {
 
 TF_DECLARE_WEAK_AND_REF_PTRS(UsdUndoStateDelegate);
@@ -52,14 +52,10 @@ private:
         SdfSpecType          deletedSpecType,
         const SdfDataRefPtr& deletedData);
     void invertMoveSpec(const SdfPath& oldPath, const SdfPath& newPath);
-    void
-    invertPushTokenChild(const SdfPath& parentPath, const TfToken& fieldName, const TfToken& value);
-    void
-    invertPopTokenChild(const SdfPath& parentPath, const TfToken& fieldName, const TfToken& value);
-    void
-    invertPushPathChild(const SdfPath& parentPath, const TfToken& fieldName, const SdfPath& value);
-    void
-         invertPopPathChild(const SdfPath& parentPath, const TfToken& fieldName, const SdfPath& value);
+    void invertPushTokenChild(const SdfPath& parentPath, const TfToken& fieldName, const TfToken& value);
+    void invertPopTokenChild(const SdfPath& parentPath, const TfToken& fieldName, const TfToken& value);
+    void invertPushPathChild(const SdfPath& parentPath, const TfToken& fieldName, const SdfPath& value);
+    void invertPopPathChild(const SdfPath& parentPath, const TfToken& fieldName, const SdfPath& value);
     void invertSetFieldDictValueByKey(
         const SdfPath& path,
         const TfToken& fieldName,
@@ -75,10 +71,8 @@ protected:
     void _OnSetLayer(const SdfLayerHandle& layer) override;
 
     void _OnSetField(const SdfPath& path, const TfToken& fieldName, const VtValue& value) override;
-    void _OnSetField(
-        const SdfPath&                   path,
-        const TfToken&                   fieldName,
-        const SdfAbstractDataConstValue& value) override;
+    void _OnSetField(const SdfPath& path, const TfToken& fieldName, const SdfAbstractDataConstValue& value)
+        override;
 
     void _OnSetFieldDictValueByKey(
         const SdfPath& path,
@@ -92,32 +86,23 @@ protected:
         const SdfAbstractDataConstValue& value) override;
 
     void _OnSetTimeSample(const SdfPath& path, double time, const VtValue& value) override;
-    void _OnSetTimeSample(const SdfPath& path, double time, const SdfAbstractDataConstValue& value)
-        override;
+    void _OnSetTimeSample(const SdfPath& path, double time, const SdfAbstractDataConstValue& value) override;
 
     void _OnCreateSpec(const SdfPath& path, SdfSpecType specType, bool inert) override;
 
     void _OnDeleteSpec(const SdfPath& path, bool inert) override;
     void _OnMoveSpec(const SdfPath& oldPath, const SdfPath& newPath) override;
 
-    void _OnPushChild(const SdfPath& parentPath, const TfToken& fieldName, const TfToken& value)
-        override;
-    void _OnPushChild(const SdfPath& parentPath, const TfToken& fieldName, const SdfPath& value)
-        override;
-    void _OnPopChild(const SdfPath& parentPath, const TfToken& fieldName, const TfToken& oldValue)
-        override;
-    void _OnPopChild(const SdfPath& parentPath, const TfToken& fieldName, const SdfPath& oldValue)
-        override;
+    void _OnPushChild(const SdfPath& parentPath, const TfToken& fieldName, const TfToken& value) override;
+    void _OnPushChild(const SdfPath& parentPath, const TfToken& fieldName, const SdfPath& value) override;
+    void _OnPopChild(const SdfPath& parentPath, const TfToken& fieldName, const TfToken& oldValue) override;
+    void _OnPopChild(const SdfPath& parentPath, const TfToken& fieldName, const SdfPath& oldValue) override;
 
 private:
-    void _OnSetFieldDictValueByKeyImpl(
-        const SdfPath& path,
-        const TfToken& fieldName,
-        const TfToken& keyPath);
+    void _OnSetFieldDictValueByKeyImpl(const SdfPath& path, const TfToken& fieldName, const TfToken& keyPath);
     void _OnSetTimeSampleImpl(const SdfPath& path, double time);
 
-    template <class T>
-    void _PopChild(const SdfPath& parentPath, const TfToken& fieldName, const T& oldValue);
+    template <class T> void _PopChild(const SdfPath& parentPath, const TfToken& fieldName, const T& oldValue);
 
 private:
     SdfLayerHandle _layer;

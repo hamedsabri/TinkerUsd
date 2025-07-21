@@ -2,15 +2,14 @@
 
 #include "camera/usdCamera.h"
 #include "core/utils.h"
+#include "render/grid.h"
 #include "render/usdDrawTargetFBO.h"
 #include "render/usdRenderEngineGL.h"
-#include "render/grid.h"
 
 #include <QOpenGLFunctions_4_5_Core>
 #include <QOpenGLWidget>
 #include <QString>
 #include <QVector>
-
 #include <pxr/base/tf/notice.h>
 #include <pxr/usd/usd/notice.h>
 #include <pxr/usd/usd/stage.h>
@@ -46,10 +45,10 @@ public:
     QString rendererDisplayName() const;
     QString upAxisDisplayName() const;
 
-    void setShadingMode(ShadingMode mode);
+    void        setShadingMode(ShadingMode mode);
     ShadingMode shadingMode() const;
 
-    void setRendererAov(const std::string& name);
+    void                     setRendererAov(const std::string& name);
     std::vector<std::string> getRendererAovs() const;
 
 protected:

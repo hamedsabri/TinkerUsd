@@ -17,10 +17,11 @@ namespace TINKERUSD_NS
  */
 class AbstractPropertyEditor
 {
-public:  
-    AbstractPropertyEditor(const QString& name, 
-                           const QVariant& currentValue, 
-                           const QString& tooltip = QString());
+public:
+    AbstractPropertyEditor(
+        const QString&  name,
+        const QVariant& currentValue,
+        const QString&  tooltip = QString());
 
     ~AbstractPropertyEditor() = default;
 

@@ -2,14 +2,13 @@
 
 #include "core/utils.h"
 
+#include <memory>
+#include <pxr/base/gf/bbox3d.h>
 #include <pxr/imaging/glf/simpleLight.h>
 #include <pxr/usd/usd/stage.h>
 #include <pxr/usdImaging/usdImagingGL/engine.h>
 #include <pxr/usdImaging/usdImagingGL/renderParams.h>
-#include <pxr/base/gf/bbox3d.h>
-
 #include <vector>
-#include <memory>
 
 namespace TINKERUSD_NS
 {
@@ -27,7 +26,7 @@ public:
     void render(const PXR_NS::UsdStageRefPtr& stage, UsdCamera* camera, double w, double h);
 
     PXR_NS::UsdImagingGLRenderParams& params();
-    pxr::UsdImagingGLEngine* getUsdImagingGLEngine() const; 
+    pxr::UsdImagingGLEngine*          getUsdImagingGLEngine() const;
 
     std::vector<std::string> getRendererAovs() const;
     void                     setRendererAov(const std::string& name);

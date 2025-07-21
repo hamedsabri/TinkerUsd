@@ -29,7 +29,7 @@ void UsdCamera::initialize()
     m_aspectRatio = 1.0;
 
     UsdGeomBBoxCache bboxCache(UsdTimeCode::Default(), UsdGeomImageable::GetOrderedPurposeTokens());
-	setBoundingBox(bboxCache.ComputeWorldBound(m_stage->GetPseudoRoot()));
+    setBoundingBox(bboxCache.ComputeWorldBound(m_stage->GetPseudoRoot()));
 
     m_camera.SetPerspectiveFromAspectRatioAndFieldOfView(m_aspectRatio, m_fov, GfCamera::FOVVertical);
     m_camera.SetFocusDistance(m_distance);
@@ -44,10 +44,7 @@ const GfCamera& UsdCamera::getCamera() const { return m_camera; }
 
 GfMatrix4d UsdCamera::getViewMatrix() const { return m_camera.GetFrustum().ComputeViewMatrix(); }
 
-GfMatrix4d UsdCamera::getProjectionMatrix() const
-{
-    return m_camera.GetFrustum().ComputeProjectionMatrix();
-}
+GfMatrix4d UsdCamera::getProjectionMatrix() const { return m_camera.GetFrustum().ComputeProjectionMatrix(); }
 
 void UsdCamera::setBoundingBox(const GfBBox3d& bBox)
 {
@@ -85,28 +82,31 @@ void UsdCamera::updateTransform()
     matrix *= GfMatrix4d().SetTranslate(m_center);
     m_camera.SetTransform(matrix);
 
-    if (m_camera.GetProjection() == GfCamera::Perspective) {
+    if (m_camera.GetProjection() == GfCamera::Perspective)
+    {
         // reset projection
         m_camera.SetPerspectiveFromAspectRatioAndFieldOfView(m_aspectRatio, m_fov, GfCamera::FOVVertical);
         m_camera.SetFocusDistance(m_distance);
         m_camera.SetClippingRange(GfRange1f(m_nearClip, m_farClip));
     }
-
 }
 
 void UsdCamera::frameBoundingBox()
 {
-    if (m_camera.GetProjection() == GfCamera::Perspective) {
+    if (m_camera.GetProjection() == GfCamera::Perspective)
+    {
         // calculate distance
         auto size = m_range.GetSize();
         auto maxsize = std::max(size[0], std::max(size[1], size[2]));
         auto fov = m_fov * 0.5;
-        if (m_fov == 0.0) {
+        if (m_fov == 0.0)
+        {
             m_fov = 0.5;
         }
         auto lengthToFit = maxsize * 0.5;
         m_distance = lengthToFit / std::atan(fov * (PI / 180.0));
-        if (m_distance < m_nearClip + maxsize * 0.5) {
+        if (m_distance < m_nearClip + maxsize * 0.5)
+        {
             m_distance = m_nearClip + lengthToFit;
         }
     }
@@ -130,25 +130,13 @@ void UsdCamera::adjustDistance(double scaleFactor)
     }
 }
 
-double UsdCamera::aspectRatio() const 
-{ 
-    return m_aspectRatio; 
-}
+double UsdCamera::aspectRatio() const { return m_aspectRatio; }
 
-void UsdCamera::setAspectRatio(double aspectRatio) 
-{ 
-    m_aspectRatio = aspectRatio; 
-}
+void UsdCamera::setAspectRatio(double aspectRatio) { m_aspectRatio = aspectRatio; }
 
-UsdCamera::DragMode UsdCamera::getDragMode() const 
-{ 
-    return m_dragMode; 
-}
+UsdCamera::DragMode UsdCamera::getDragMode() const { return m_dragMode; }
 
-void UsdCamera::setDragMode(UsdCamera::DragMode dragMode) 
-{ 
-    m_dragMode = dragMode; 
-}
+void UsdCamera::setDragMode(UsdCamera::DragMode dragMode) { m_dragMode = dragMode; }
 
 void UsdCamera::dolly(double x, double y)
 {
@@ -167,14 +155,16 @@ void UsdCamera::pan(double x, double y)
 
 void UsdCamera::zoom(double zoomFactor)
 {
-    if (m_camera.GetProjection() == GfCamera::Perspective) {
+    if (m_camera.GetProjection() == GfCamera::Perspective)
+    {
         adjustDistance(1 + zoomFactor);
     }
 }
 
 double UsdCamera::computePixelsToWorldFactor(int height)
 {
-    if (m_camera.GetProjection() == GfCamera::Perspective) {
+    if (m_camera.GetProjection() == GfCamera::Perspective)
+    {
         auto frustum = m_camera.GetFrustum();
         auto frustumHeight = frustum.GetWindow().GetSize()[1];
         return frustumHeight * m_distance / height;

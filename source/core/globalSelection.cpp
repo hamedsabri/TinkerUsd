@@ -13,7 +13,8 @@ GlobalSelection& GlobalSelection::instance()
 
 void GlobalSelection::setPrim(const UsdPrim& prim)
 {
-    if (prim == m_selectedPrim) {
+    if (prim == m_selectedPrim)
+    {
         return;
     }
 
@@ -23,19 +24,14 @@ void GlobalSelection::setPrim(const UsdPrim& prim)
     emit selectionChanged(m_selectedPrim);
 }
 
-UsdPrim GlobalSelection::prim() const 
-{ 
-    return m_selectedPrim; 
-}
+UsdPrim GlobalSelection::prim() const { return m_selectedPrim; }
 
-SdfPath GlobalSelection::path() const
-{
-    return m_selectedPrim ? m_selectedPrim.GetPath() : SdfPath();
-}
+SdfPath GlobalSelection::path() const { return m_selectedPrim ? m_selectedPrim.GetPath() : SdfPath(); }
 
 void GlobalSelection::clearSelection()
 {
-    if (!m_selectedPrim.IsValid()) {
+    if (!m_selectedPrim.IsValid())
+    {
         return;
     }
 

@@ -13,7 +13,7 @@ class PropertyTreeView;
 /*
  * @class SearchBar
  * @brief This widget is used for searching and filtering items in a PropertyTreeView.
-*/
+ */
 class SearchBar : public QWidget
 {
     Q_OBJECT
@@ -23,13 +23,13 @@ public:
 
 signals:
     /*
-    * signal emitted when the text in the search bar changes.
-    */
-    void textChanged(const QString &text);
+     * signal emitted when the text in the search bar changes.
+     */
+    void textChanged(const QString& text);
 
     /*
-    * signal emitted when a special filter keyword is detected in the search bar.
-    */
+     * signal emitted when a special filter keyword is detected in the search bar.
+     */
     void specialFilterChanged(SpecialFilterKeyword keyword);
 
 private slots:
@@ -38,11 +38,11 @@ private slots:
     void onHelpLegendToggled(bool checked);
 
 private:
-    QLineEdit*          m_lineEdit;
-    QToolButton*        m_legendHelpButton;
-    QAction*            m_clearAction;
-    QAction*            m_searchAction;
-    PropertyTreeView*   m_treeView;
+    QLineEdit*        m_lineEdit;
+    QToolButton*      m_legendHelpButton;
+    QAction*          m_clearAction;
+    QAction*          m_searchAction;
+    PropertyTreeView* m_treeView;
 };
 
 } // namespace TINKERUSD_NS

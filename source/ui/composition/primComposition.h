@@ -2,7 +2,6 @@
 
 #include <QPoint>
 #include <QTreeWidget>
-
 #include <pxr/usd/usd/prim.h>
 
 namespace TINKERUSD_NS

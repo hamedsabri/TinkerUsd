@@ -16,7 +16,7 @@ const char* vertexShaderSrc = R"(#version 450 core
     }
     )";
 
-    const char* fragmentShaderSrc = R"(#version 450 core
+const char* fragmentShaderSrc = R"(#version 450 core
         in vec2 TexCoord;
         out vec4 FragColor;
         uniform sampler2D screenTexture;
@@ -47,8 +47,8 @@ UsdDrawTargetFBO::UsdDrawTargetFBO()
     , m_width(512)
     , m_height(512)
     , m_shaderProgram(0)
-{ 
-    initializeOpenGLFunctions(); 
+{
+    initializeOpenGLFunctions();
 }
 
 UsdDrawTargetFBO::~UsdDrawTargetFBO()
@@ -78,8 +78,7 @@ void UsdDrawTargetFBO::resize(int width, int height)
 
     m_drawTarget->AddAttachment(TfToken("color"), GL_RGBA, GL_FLOAT, GL_RGBA);
 
-    m_drawTarget->AddAttachment(
-        TfToken("depth"), GL_DEPTH_COMPONENT, GL_FLOAT, GL_DEPTH_COMPONENT32F);
+    m_drawTarget->AddAttachment(TfToken("depth"), GL_DEPTH_COMPONENT, GL_FLOAT, GL_DEPTH_COMPONENT32F);
 
     m_drawTarget->Unbind();
 
@@ -137,26 +136,30 @@ void UsdDrawTargetFBO::initializeQuad()
 
 void UsdDrawTargetFBO::bind()
 {
-    if (m_drawTarget) {
+    if (m_drawTarget)
+    {
         m_drawTarget->Bind();
     }
 }
 
 void UsdDrawTargetFBO::unbind()
 {
-    if (m_drawTarget) {
+    if (m_drawTarget)
+    {
         m_drawTarget->Unbind();
     }
 }
 
 void UsdDrawTargetFBO::draw()
 {
-    if (!m_drawTarget) {
+    if (!m_drawTarget)
+    {
         return;
     }
 
     GLuint texId = m_drawTarget->GetAttachment("color")->GetGlTextureName();
-    if (texId == 0) {
+    if (texId == 0)
+    {
         return;
     }
 

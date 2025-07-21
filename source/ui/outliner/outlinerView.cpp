@@ -4,8 +4,8 @@
 #include "outlinerModel.h"
 
 #include <QItemSelectionModel>
-#include <QLineEdit>
 #include <QKeyEvent>
+#include <QLineEdit>
 
 namespace TINKERUSD_NS
 {
@@ -38,10 +38,7 @@ UsdOutlinerView::UsdOutlinerView(QWidget* parent)
     m_searchLineEdit->setClearButtonEnabled(true);
 
     connect(
-        selectionModel(),
-        &QItemSelectionModel::selectionChanged,
-        this,
-        &UsdOutlinerView::onSelectionChanged);
+        selectionModel(), &QItemSelectionModel::selectionChanged, this, &UsdOutlinerView::onSelectionChanged);
     connect(m_searchLineEdit, &QLineEdit::textChanged, this, &UsdOutlinerView::onSearchTextChanged);
 }
 
@@ -49,20 +46,23 @@ void UsdOutlinerView::setStage(const PXR_NS::UsdStageRefPtr& stage)
 {
     m_model->setStage(stage);
 
-    if (m_searchLineEdit) {
+    if (m_searchLineEdit)
+    {
         m_searchLineEdit->clear();
     }
 }
 
 void UsdOutlinerView::onSelectionChanged(const QItemSelection& selected)
 {
-    if (selected.indexes().isEmpty()) {
+    if (selected.indexes().isEmpty())
+    {
         return;
     }
 
-    QModelIndex  index = selected.indexes().first().siblingAtColumn(0);
+    QModelIndex     index = selected.indexes().first().siblingAtColumn(0);
     PXR_NS::UsdPrim prim = m_proxyModel->primFromIndex(index);
-    if (prim.IsValid()) {
+    if (prim.IsValid())
+    {
         GlobalSelection::instance().setPrim(prim);
     }
 }
@@ -71,7 +71,8 @@ void UsdOutlinerView::onSearchTextChanged(const QString& text)
 {
     m_proxyModel->setFilterPattern(text);
 
-    if (!text.isEmpty()) {
+    if (!text.isEmpty())
+    {
         expandAll();
     }
 }
@@ -79,12 +80,14 @@ void UsdOutlinerView::onSearchTextChanged(const QString& text)
 void UsdOutlinerView::focusPrim(const UsdPrim& prim)
 {
     QModelIndex sourceIndex = m_model->indexFromPrim(prim);
-    if (!sourceIndex.isValid()) {
+    if (!sourceIndex.isValid())
+    {
         return;
     }
 
     QModelIndex proxyIndex = m_proxyModel->mapFromSource(sourceIndex);
-    if (!proxyIndex.isValid()) {
+    if (!proxyIndex.isValid())
+    {
         return;
     }
 
