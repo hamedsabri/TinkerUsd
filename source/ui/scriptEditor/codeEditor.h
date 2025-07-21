@@ -1,5 +1,7 @@
 #pragma once
 
+#include "pythonHighlighter.h"
+
 #include <QObject>
 #include <QPlainTextEdit>
 
@@ -28,7 +30,8 @@ private slots:
     void updateLineNumberArea(const QRect& rect, int dy);
 
 private:
-    QWidget* lineNumberArea;
+    QWidget*           lineNumberArea;
+    PythonHighlighter* highlighter;
 };
 
 class LineNumberArea : public QWidget

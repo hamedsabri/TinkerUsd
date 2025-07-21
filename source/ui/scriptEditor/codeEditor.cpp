@@ -1,5 +1,7 @@
 #include "CodeEditor.h"
 
+#include "pythonHighlighter.h"
+
 #include <QPainter>
 #include <QTextBlock>
 
@@ -10,6 +12,7 @@ CodeEditor::CodeEditor(QWidget* parent)
     : QPlainTextEdit(parent)
 {
     lineNumberArea = new LineNumberArea(this);
+    highlighter = new PythonHighlighter(document());
 
     connect(this, &QPlainTextEdit::blockCountChanged, this, &CodeEditor::updateLineNumberAreaWidth);
     connect(this, &QPlainTextEdit::updateRequest, this, &CodeEditor::updateLineNumberArea);

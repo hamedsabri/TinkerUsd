@@ -5,4 +5,5 @@ target_sources(${PROJECT_NAME}
     PRIVATE
       scriptEditor.cpp
       codeEditor.cpp
+      pythonHighlighter.cpp
 )
