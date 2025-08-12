@@ -21,8 +21,12 @@ public:
     void undo() override;
     void redo() override;
 
+    void setRefreshCallback(std::function<void()> cb) { m_refreshCallback = std::move(cb); }
+
 private:
     UsdUndoableItem m_undoableItem;
+
+    std::function<void()> m_refreshCallback;
 };
 
 } // namespace TINKERUSD_NS

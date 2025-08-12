@@ -1,34 +1,38 @@
 #include "undoManager.h"
-
 #include <QDebug>
-#include <QUndoCommand>
-#include <QUndoStack>
 
 namespace TINKERUSD_NS
 {
 
-QUndoStack* UndoManager::s_undoStack = new QUndoStack();
+UndoManager& UndoManager::instance()
+{
+    static UndoManager instance;
+    return instance;
+}
 
-QUndoStack* UndoManager::undoStack() { return s_undoStack; }
+QUndoStack* UndoManager::undoStack()
+{
+    return &m_undoStack;
+}
 
 QAction* UndoManager::createUndoAction(QObject* parent, const QString& prefix)
 {
-    return s_undoStack->createUndoAction(parent, prefix);
+    return m_undoStack.createUndoAction(parent, prefix);
 }
 
 QAction* UndoManager::createRedoAction(QObject* parent, const QString& prefix)
 {
-    return s_undoStack->createRedoAction(parent, prefix);
+    return m_undoStack.createRedoAction(parent, prefix);
 }
 
 void UndoManager::displayUndoStackInfo()
 {
     qDebug() << "---- Undo Stack ----";
-    for (auto i = 0; i < UndoManager::undoStack()->count(); ++i)
+    for (int i = 0; i < m_undoStack.count(); ++i)
     {
-        const QUndoCommand* cmd = UndoManager::undoStack()->command(i);
-        QString             label = cmd ? cmd->text() : "null";
-        QString             marker = (i == UndoManager::undoStack()->index()) ? " <- current" : "";
+        const QUndoCommand* cmd = m_undoStack.command(i);
+        QString label = cmd ? cmd->text() : "null";
+        QString marker = (i == m_undoStack.index()) ? " <- current" : "";
         qDebug() << QString("#%1: %2%3").arg(i).arg(label, marker);
     }
     qDebug() << "--------------------";
@@ -37,7 +41,7 @@ void UndoManager::displayUndoStackInfo()
 UndoCommand::UndoCommand(const QString& commandName)
     : QUndoCommand(QString("'%1'").arg(commandName))
 {
-    UndoManager::undoStack()->push(this);
+    UndoManager::instance().undoStack()->push(this);
 }
 
 } // namespace TINKERUSD_NS

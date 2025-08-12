@@ -23,17 +23,20 @@ void MainMenuBar::setupMenus()
 
     QAction* newStageAction = new QAction("New Stage", this);
     QAction* openStageAction = new QAction("Open Stage", this);
+    QAction* saveEditsAction = new QAction("Save", this);
     QAction* quitAction = new QAction("Quit", this);
 
     fileMenu->addAction(newStageAction);
     fileMenu->addAction(openStageAction);
     fileMenu->addSeparator();
+    fileMenu->addAction(saveEditsAction);
+    fileMenu->addSeparator();
     fileMenu->addAction(quitAction);
 
     // edit
     QMenu*   editMenu = addMenu("Edit");
-    QAction* undoAction = UndoManager::createUndoAction(this);
-    QAction* redoAction = UndoManager::createRedoAction(this);
+    QAction* undoAction = UndoManager::instance().createUndoAction(this);
+    QAction* redoAction = UndoManager::instance().createRedoAction(this);
     QAction* clearUndoAction = new QAction("Clear Undo History", this);
     QAction* debugUndoStackAction = new QAction("Debug UndoStack", this);
     undoAction->setShortcut(QKeySequence::Undo);
@@ -52,13 +55,24 @@ void MainMenuBar::setupMenus()
     QAction* frameSelectedAction = new QAction("Frame Selected", this);
     frameSelectedAction->setShortcut(QKeySequence(Qt::Key_F));
     QAction* resetAction = new QAction("Reset", this);
+    QAction* cameraSettingsAction = new QAction("Camera Settings...", this);
+
     cameraMenu->addAction(frameSelectedAction);
     cameraMenu->addAction(resetAction);
+    cameraMenu->addSeparator();
+    cameraMenu->addAction(cameraSettingsAction);
 
     // help
     QMenu*   helpMenu = addMenu("Help");
     QAction* about = new QAction("About", this);
     helpMenu->addAction(about);
+
+    // debug
+    QMenu* debugMenu = addMenu("Render");
+    QAction* showRendererStats = new QAction("Show Renderer Stats", this);
+    showRendererStats->setCheckable(true);
+    showRendererStats->setChecked(false);
+    debugMenu->addAction(showRendererStats);
 
     connect(newStageAction, &QAction::triggered, this, &MainMenuBar::requestNewStage);
     connect(openStageAction, &QAction::triggered, [this]() {
@@ -80,10 +94,14 @@ void MainMenuBar::setupMenus()
 
     connect(frameSelectedAction, &QAction::triggered, this, &MainMenuBar::camFrameSelectSignal);
     connect(resetAction, &QAction::triggered, this, &MainMenuBar::camResetSignal);
+    connect(cameraSettingsAction,&QAction::triggered, this, &MainMenuBar::camSettingsRequested);
+    connect(showRendererStats, &QAction::toggled, this, &MainMenuBar::showRendererStatsToggled);
 
-    connect(clearUndoAction, &QAction::triggered, this, []() { UndoManager::undoStack()->clear(); });
+    connect(clearUndoAction, &QAction::triggered, this, []() { UndoManager::instance().undoStack()->clear(); });
 
-    connect(debugUndoStackAction, &QAction::triggered, this, []() { UndoManager::displayUndoStackInfo(); });
+    connect(debugUndoStackAction, &QAction::triggered, this, []() { UndoManager::instance().displayUndoStackInfo(); });
+
+    connect(saveEditsAction, &QAction::triggered, this, &MainMenuBar::requestSaveEdits);
 }
 
 } // namespace TINKERUSD_NS

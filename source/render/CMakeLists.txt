@@ -6,4 +6,5 @@ target_sources(${TARGET_NAME}
         usdRenderEngineGL.cpp
         usdDrawTargetFBO.cpp
         grid.cpp
+        hudOverLay.cpp
 )

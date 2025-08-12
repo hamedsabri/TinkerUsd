@@ -13,6 +13,9 @@ namespace TINKERUSD_NS
 TINKERUSD_PUBLIC
 PXR_NS::UsdPrim selectedPrim();
 
+TINKERUSD_PUBLIC
+PXR_NS::SdfPath selectedPrimPath();
+
 #define DISALLOW_COPY_MOVE_ASSIGNMENT(ClassName)     \
     ClassName(const ClassName&) = delete;            \
     ClassName& operator=(const ClassName&) = delete; \

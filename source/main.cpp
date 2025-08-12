@@ -1,4 +1,5 @@
 #include "ui/mainWindow.h"
+#include "ui/logger/loggerWidget.h"
 
 #include <QApplication>
 #include <QFile>
@@ -18,6 +19,9 @@ int main(int argc, char** argv)
         QString darkStyle = styleFile.readAll();
         app.setStyleSheet(darkStyle);
     }
+
+    LogWidget::instance().installMessageHandler();
+    LogWidget::instance().setToStdout(true);
 
     app.setWindowIcon(QIcon(":/app_icon.svg"));
 

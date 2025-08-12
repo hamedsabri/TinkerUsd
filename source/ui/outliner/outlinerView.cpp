@@ -40,6 +40,17 @@ UsdOutlinerView::UsdOutlinerView(QWidget* parent)
     connect(
         selectionModel(), &QItemSelectionModel::selectionChanged, this, &UsdOutlinerView::onSelectionChanged);
     connect(m_searchLineEdit, &QLineEdit::textChanged, this, &UsdOutlinerView::onSearchTextChanged);
+
+
+    connect(
+        &GlobalSelection::instance(), &GlobalSelection::selectionChanged,
+        this, [this](const PXR_NS::UsdPrim& prim) {
+            if (prim.IsValid()) {
+                focusPrim(prim);
+            } else {
+                selectionModel()->clearSelection();
+            }
+        });
 }
 
 void UsdOutlinerView::setStage(const PXR_NS::UsdStageRefPtr& stage)
@@ -59,7 +70,7 @@ void UsdOutlinerView::onSelectionChanged(const QItemSelection& selected)
         return;
     }
 
-    QModelIndex     index = selected.indexes().first().siblingAtColumn(0);
+    QModelIndex index = selected.indexes().first().siblingAtColumn(0);
     PXR_NS::UsdPrim prim = m_proxyModel->primFromIndex(index);
     if (prim.IsValid())
     {

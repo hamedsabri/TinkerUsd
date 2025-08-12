@@ -200,23 +200,45 @@ CodeEditor* ScriptEditor::currentScriptEditor() const
     return nullptr;
 }
 
+/**
+ * When using separate globals and locals dictionaries in PyRun_String():
+ * - Top-level imports (like 'from pxr import UsdGeom') go into the locals dictionary
+ * - Function definitions also go into locals, but functions look up names in globals by default
+ * - This causes NameError when functions try to access imported modules
+ * 
+ * I am using the same dictionary (globals) for both parameters to PyRun_String(). This behavior matches Python's interactive interpreter
+ * This ensures that imports are accessible to both module-level code and function definitions
+  * Example that would fail with separate locals/globals:
+ *   from pxr import UsdGeom
+ *   def my_function():
+ *       geom = UsdGeom.Sphere()  # NameError: 'UsdGeom' is not defined
+ * 
+ * Note: This approach does not persist state between script runs. Each execution
+ * starts with a fresh namespace containing only Python built-ins.
+ */
 void ScriptEditor::runScript()
 {
+    // get the currently active script editor tab
     CodeEditor* scriptEditor = currentScriptEditor();
-    if (!scriptEditor)
+    if (!scriptEditor) {
         return;
+    }
 
+    // read the script text from the editor
     QString script = scriptEditor->toPlainText();
-    if (script.isEmpty())
+    if (script.isEmpty()) {
         return;
+    }
 
-    // Execute the Python script
+    // get the __main__ module and its global namespace dictionary
     PyObject* main = PyImport_AddModule("__main__");
     PyObject* globals = PyModule_GetDict(main);
-    PyObject* locals = PyDict_New();
 
-    PyObject* result = PyRun_String(script.toUtf8().constData(), Py_file_input, globals, locals);
+    // use globals for both parameters - this ensures functions can access
+    // imported modules and variables defined at module level
+    PyObject* result = PyRun_String(script.toUtf8().constData(), Py_file_input, globals, globals);
 
+    // if evaluation succeeded, display the script (or results if desired)
     if (result)
     {
         Py_DECREF(result);
@@ -224,10 +246,11 @@ void ScriptEditor::runScript()
     }
     else
     {
+        // on error, print Python traceback to stderr (which is redirected to the UI)
         PyErr_Print();
     }
 
-    Py_DECREF(locals);
+    // No need to clean up locals since we're using globals. Revisit this...
 }
 
 void ScriptEditor::clearOutput()

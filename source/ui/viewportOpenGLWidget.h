@@ -5,6 +5,8 @@
 #include "render/grid.h"
 #include "render/usdDrawTargetFBO.h"
 #include "render/usdRenderEngineGL.h"
+#include "render/hudOverLay.h"
+
 
 #include <QOpenGLFunctions_4_5_Core>
 #include <QOpenGLWidget>
@@ -42,14 +44,18 @@ public:
 
     DISALLOW_COPY_MOVE_ASSIGNMENT(ViewportOpenGLWidget);
 
-    QString rendererDisplayName() const;
     QString upAxisDisplayName() const;
 
-    void        setShadingMode(ShadingMode mode);
+    void setShadingMode(ShadingMode mode);
     ShadingMode shadingMode() const;
 
-    void                     setRendererAov(const std::string& name);
+    void setRendererAov(const std::string& name);
     std::vector<std::string> getRendererAovs() const;
+
+    void setShowRendererStats(bool val);
+
+    double nearClip() const;
+    double farClip()  const;
 
 protected:
     void initializeGL() override;
@@ -64,6 +70,7 @@ private:
     void initialize();
     void onUsdObjectChanged(const UsdNotice::ObjectsChanged& notice);
     void onSelectionChanged();
+    void hudDrawRendereStats();
 
 Q_SIGNALS:
     void rendererAvailable();
@@ -74,6 +81,7 @@ private slots:
 public slots:
     void frameSelected();
     void reset();
+    void setClipPlanes(double nearClip, double farClip);
 
 private:
     UsdDocument*                       m_usdDocument;
@@ -87,6 +95,8 @@ private:
     double                             m_height;
     double                             m_width;
     ShadingMode                        m_shadingMode;
+    HudOverlay                         m_hud;
+    bool                               m_showRendererStats{false};
 };
 
 } // namespace TINKERUSD_NS

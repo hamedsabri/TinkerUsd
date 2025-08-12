@@ -592,12 +592,7 @@ template <typename T> void SliderGroup<T>::onSliderReleased()
 
 template <typename T> void SliderGroup<T>::onSpinBoxEditingFinished()
 {
-    const T previousValue = m_value;
     setValue(QVariant::fromValue(m_valueEntry->value()));
-    if (previousValue != m_value)
-    {
-        emit valueUpdated(QVariant::fromValue(m_value));
-    }
 }
 
 // Explicit instantiations

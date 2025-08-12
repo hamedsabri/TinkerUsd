@@ -11,6 +11,8 @@ namespace TINKERUSD_NS
 
 PXR_NS::UsdPrim selectedPrim() { return GlobalSelection::instance().prim(); }
 
+PXR_NS::SdfPath selectedPrimPath() { return GlobalSelection::instance().path(); }
+
 GfBBox3d stageBbox(const PXR_NS::UsdStageRefPtr& stage)
 {
     UsdGeomBBoxCache bboxCache(UsdTimeCode::Default(), UsdGeomImageable::GetOrderedPurposeTokens());
@@ -20,7 +22,7 @@ GfBBox3d stageBbox(const PXR_NS::UsdStageRefPtr& stage)
 GfBBox3d globalSelectionBbox(const PXR_NS::UsdStageRefPtr& stage)
 {
     UsdGeomBBoxCache bboxCache(UsdTimeCode::Default(), UsdGeomImageable::GetOrderedPurposeTokens());
-    auto             selectedPrim = stage->GetPrimAtPath(GlobalSelection::instance().path());
+    auto selectedPrim = stage->GetPrimAtPath(GlobalSelection::instance().path());
     if (!selectedPrim.IsValid())
     {
         return GfBBox3d();

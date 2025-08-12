@@ -22,7 +22,7 @@ public:
 
     PXR_NS::UsdStageRefPtr getCurrentStage() const;
 
-    PXR_NS::SdfLayerRefPtr getCurrentLayer() const;
+    PXR_NS::SdfLayerRefPtr getRootLayer() const;
 
 signals:
     void stageOpened(const QString& filePath);

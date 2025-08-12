@@ -55,6 +55,31 @@ private:
 
     // counts all properties recursively, including those in groups.
     int32_t countAllProperties(const QStandardItem* parentItem) const;
+
+    void refreshRowFromUsd(const QModelIndex& index);
+
+private:
+    // HS 2025:
+    // Guard flag to prevent unintended recursion during undo/redo refresh.
+    //
+    // When an undo or redo operation occurs, we refresh the affected row(s)
+    // by updating both AbstractPropertyEditor::currentValue() and the associated
+    // QStandardItem data. This ensures that QStandardItemModel::data() returns
+    // the correct value and the delegate paints the correct representation.
+    //
+    // However, calling item->setData(...) during this refresh would
+    // invoke our PropertyModel::setData() override again, which (by design)
+    // creates and pushes a new UsdUndoAttributeCommand. 
+    //
+    // This would corrupt the QUndoStack if it happened during undo/redo execution,
+    // resulting in duplicate commands or crashes.
+    //
+    // Therefore, we use `m_inUndoRedoRefresh` as a simple and explicit guard:
+    //  - It is `false` during normal user-initiated edits
+    //  - It is temporarily set to `true` during undo/redo-driven refreshes
+    //    to suppress creation of new commands.
+    //
+    bool m_inUndoRedoRefresh { false };
 };
 
 } //  namespace TINKERUSD_NS

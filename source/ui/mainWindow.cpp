@@ -9,6 +9,8 @@
 #include "propertyEditor/propertyWidget.h"
 #include "scriptEditor/scriptEditor.h"
 #include "viewportOpenGLWidget.h"
+#include "logger/loggerWidget.h"
+#include "cameraSettingsDialog.h"
 
 #include <QComboBox>
 #include <QDir>
@@ -16,6 +18,7 @@
 #include <QLabel>
 #include <QStatusBar>
 #include <QToolBar>
+#include <QPlainTextEdit>
 
 namespace TINKERUSD_NS
 {
@@ -36,6 +39,7 @@ MainWindow::MainWindow(QWidget* parent)
     auto propertyWidget = new PropertyWidget(usdDocument);
     auto aovComboBox = new QComboBox();
     auto shadingComboBox = new QComboBox();
+    LogWidget& loggerWidget = LogWidget::instance(this);
 
     // ads styles heet
     QFile StyleSheetFile(":/drak_ads.css");
@@ -130,6 +134,14 @@ MainWindow::MainWindow(QWidget* parent)
     dockManager->addDockWidget(ads::BottomDockWidgetArea, scriptEditorDockWidget, dockAreaPropertyEditor);
     mainMenuBar->getPanelsMenu()->addAction(scriptEditorDockWidget->toggleViewAction());
 
+    // logger
+    ads::CDockWidget* loggerDockWidget = new ads::CDockWidget("Logger");
+    loggerDockWidget->setWidget(&loggerWidget);
+    loggerDockWidget->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
+    loggerDockWidget->setMinimumSize(340, 150);
+    dockManager->addDockWidget(ads::BottomDockWidgetArea, loggerDockWidget);
+    mainMenuBar->getPanelsMenu()->addAction(loggerDockWidget->toggleViewAction());
+
     // connection signal/slots
     connect(mainMenuBar, &MainMenuBar::requestNewStage, usdDocument, &UsdDocument::createNewStageInMemory);
     connect(mainMenuBar, &MainMenuBar::requestOpenStage, usdDocument, &UsdDocument::openStage);
@@ -150,19 +162,17 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(mainMenuBar, &MainMenuBar::camResetSignal, viewportGLWidget, &ViewportOpenGLWidget::reset);
 
-    auto rendererTypeLabel = new QLabel();
+    connect(mainMenuBar, &MainMenuBar::showRendererStatsToggled, viewportGLWidget, &ViewportOpenGLWidget::setShowRendererStats);
+
     auto stageUpAxisLabel = new QLabel(QString("Up Axis: %1 ").arg(viewportGLWidget->upAxisDisplayName()));
 
-    statusBar->addWidget(rendererTypeLabel);
     statusBar->addWidget(stageUpAxisLabel);
 
     connect(
         viewportGLWidget,
         &ViewportOpenGLWidget::rendererAvailable,
         this,
-        [this, statusBar, viewportGLWidget, rendererTypeLabel, aovComboBox]() {
-            rendererTypeLabel->setText(QString("Render: %1 ").arg(viewportGLWidget->rendererDisplayName()));
-
+        [this, statusBar, viewportGLWidget, aovComboBox]() {
             // aov
             aovComboBox->clear();
             const auto  aovs = viewportGLWidget->getRendererAovs();
@@ -180,6 +190,22 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(usdDocument, &UsdDocument::stageOpened, this, [this, viewportGLWidget, stageUpAxisLabel]() {
         stageUpAxisLabel->setText(QString("Up Axis: %1 ").arg(viewportGLWidget->upAxisDisplayName()));
+    });
+
+    connect(mainMenuBar, &MainMenuBar::requestSaveEdits, usdDocument, [usdDocument]() {
+        auto stage = usdDocument->getCurrentStage();
+        if (stage) {
+            auto targetLayer = stage->GetEditTarget().GetLayer();
+            if (targetLayer) {
+                targetLayer->Save();
+                qDebug() << "Saved edits to target layer:" << QString::fromStdString(targetLayer->GetIdentifier());
+            }
+        }
+    });
+
+    connect(mainMenuBar, &MainMenuBar::camSettingsRequested, this, [this, viewportGLWidget]() {
+        CameraSettingsDialog dlg(viewportGLWidget, this);
+        dlg.exec();
     });
 }
 

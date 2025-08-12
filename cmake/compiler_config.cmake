@@ -26,6 +26,7 @@ set(MSVC_FLAGS
     # Set some warnings as errors (to make it similar to Linux)
     /we4101
     /we4189
+    $<$<BOOL:${ENABLE_ASAN}>:/fsanitize=address>
 )
 
 set(MSVC_DEFINITIONS
@@ -47,6 +48,10 @@ set(MSVC_DEFINITIONS
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 function(compile_config TARGET)
+    target_link_options(${TARGET}
+        PRIVATE
+            $<$<BOOL:${ENABLE_ASAN}>:/fsanitize=address>
+    )
     target_compile_features(${TARGET} 
         PRIVATE
             cxx_std_20

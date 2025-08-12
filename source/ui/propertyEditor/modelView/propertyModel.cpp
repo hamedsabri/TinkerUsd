@@ -49,11 +49,28 @@ QVariant PropertyModel::data(const QModelIndex& index, int role) const
     return QStandardItemModel::data(index, role);
 }
 
+// HS 2025:
+// PropertyModel::setData() serves both user edits and internal undo/redo-triggered refresh.
+//
+// 1️ - When the user edits a property, a UsdUndoAttributeCommand is created and pushed to UndoManager::instance().undoStack().
+// 2️-  Each UsdUndoAttributeCommand has a private UndoNotifier (QObject) which emits undoOrRedoPerformed()
+//     when the command's undo() or redo() is executed.
+// 3️-  PropertyModel connects this signal at the time of command creation that refreshes
+//     only the affected row, reading the current value from the UsdAttributeWrapper.
+// 4️-  To avoid recursive undo stack corruption, a guard (m_inUndoRedoRefresh) ensures that any setData() calls
+//     originating from the refresh logic do NOT create new undo commands.
+//
+//  This approach provides a fine-grained UI updates (no full model reset required)
+
 bool PropertyModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
     if (!index.isValid())
     {
         return false;
+    }
+
+    if (m_inUndoRedoRefresh) {
+        return QStandardItemModel::setData(index, value, role);
     }
 
     if (role == Qt::EditRole && index.column() == 1)
@@ -67,8 +84,7 @@ bool PropertyModel::setData(const QModelIndex& index, const QVariant& value, int
 
         if (VariantSetEditor* variantSetEditor = dynamic_cast<VariantSetEditor*>(abstractPropEditor))
         {
-            if (variantSetEditor->setVariantSelection(value))
-            {
+            if (variantSetEditor->setVariantSelection(value)) {
                 sendDataChangedSignal = true;
             }
         }
@@ -77,14 +93,17 @@ bool PropertyModel::setData(const QModelIndex& index, const QVariant& value, int
             // set usd attribute value
             auto vtValue = abstractPropEditor->toVtValue(value);
             auto attributeWrapper = abstractPropEditor->usdAttributeWrapper();
-            if (attributeWrapper)
-            {
+            if (attributeWrapper) {
                 auto attributeCommand
                     = new UsdUndoAttributeCommand(attributeWrapper, vtValue, PXR_NS::UsdTimeCode::Default());
-                if (attributeCommand)
-                {
+                
+                if (attributeCommand) {
                     sendDataChangedSignal = true;
                 }
+
+                attributeCommand->setRefreshCallback([this, index]() {
+                    refreshRowFromUsd(index);
+                });
             }
         }
 
@@ -92,13 +111,47 @@ bool PropertyModel::setData(const QModelIndex& index, const QVariant& value, int
         {
             // send dataChanged signal to update the view
             const QModelIndex nameIndex = this->index(index.row(), 0, index.parent());
-            emit              dataChanged(nameIndex, nameIndex, { Qt::FontRole, Qt::ForegroundRole });
+            emit  dataChanged(nameIndex, nameIndex, { Qt::FontRole, Qt::ForegroundRole });
         }
 
         return QStandardItemModel::setData(index, value, role);
     }
 
     return false;
+}
+
+void PropertyModel::refreshRowFromUsd(const QModelIndex& index)
+{
+    PropertyItem* item = static_cast<PropertyItem*>(itemFromIndex(index));
+    if (!item){
+        return;
+    }
+
+    AbstractPropertyEditor* propEditor = item->editor();
+    if (!propEditor){
+        return;
+    }
+
+    UsdAttributeWrapper* attrWrapper = propEditor->usdAttributeWrapper();
+    if (!attrWrapper) {
+        return;
+    }
+
+    PXR_NS::VtValue newValue;
+    if (attrWrapper->get(newValue)) {
+        // update the editor underlying value
+        QVariant refreshed = propEditor->fromVtValue(newValue);
+        propEditor->setCurrentValue(refreshed);
+
+        // update the underlying value in the QStandardItem
+        m_inUndoRedoRefresh = true;
+        item->setData(refreshed, Qt::EditRole);
+        m_inUndoRedoRefresh = false;
+    }
+
+    // repaint this index
+    const QModelIndex nameIndex = this->index(index.row(), 0, index.parent());
+    emit dataChanged(nameIndex, nameIndex, { Qt::DisplayRole, Qt::EditRole, Qt::FontRole, Qt::ForegroundRole });
 }
 
 Qt::ItemFlags PropertyModel::flags(const QModelIndex& index) const

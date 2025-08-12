@@ -58,6 +58,10 @@ public:
 
     void reset();
 
+    double nearClip() const;
+    double farClip() const;
+    void setClippingRange(double nearClip, double farClip);
+
 private:
     void initialize();
 

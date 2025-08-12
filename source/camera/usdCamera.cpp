@@ -185,4 +185,22 @@ void UsdCamera::reset()
     frameBoundingBox();
 }
 
+double UsdCamera::nearClip() const 
+{ 
+    return m_nearClip; 
+}
+
+double UsdCamera::farClip() const 
+{ 
+    return m_farClip; 
+}
+
+void UsdCamera::setClippingRange(double nearClip, double farClip)
+{
+    m_nearClip = nearClip;
+    m_farClip  = farClip;
+
+    m_camera.SetClippingRange(GfRange1f(m_nearClip, m_farClip));
+}
+
 } // namespace TINKERUSD_NS

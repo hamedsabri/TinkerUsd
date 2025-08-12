@@ -18,8 +18,11 @@ public:
 signals:
     void requestNewStage();
     void requestOpenStage(const QString& path);
+    void requestSaveEdits();
     void camFrameSelectSignal();
     void camResetSignal();
+    void camSettingsRequested();
+    void showRendererStatsToggled(bool value);
 
 private:
     void setupMenus();

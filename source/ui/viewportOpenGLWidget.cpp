@@ -92,6 +92,8 @@ void ViewportOpenGLWidget::initialize()
 
     m_grid = std::make_unique<Grid>();
     m_grid->initialize();
+
+    m_hud.init(this);
 }
 
 void ViewportOpenGLWidget::onStageOpened(const QString& filePath)
@@ -127,11 +129,6 @@ void ViewportOpenGLWidget::resizeGL(int w, int h)
     glViewport(0, 0, w, h);
 }
 
-QString ViewportOpenGLWidget::rendererDisplayName() const
-{
-    return QString::fromStdString(m_renderEngineGL->rendererDisplayName());
-}
-
 QString ViewportOpenGLWidget::upAxisDisplayName() const
 {
     TfToken stageUpAxis = PXR_NS::UsdGeomGetStageUpAxis(m_stage);
@@ -141,6 +138,7 @@ QString ViewportOpenGLWidget::upAxisDisplayName() const
 void ViewportOpenGLWidget::setShadingMode(ViewportOpenGLWidget::ShadingMode mode)
 {
     m_shadingMode = mode;
+
     update();
 }
 
@@ -193,7 +191,7 @@ void ViewportOpenGLWidget::paintGL()
     m_renderEngineGL->params().forceRefresh = false;
     m_renderEngineGL->params().enableLighting = true; // false to turn off camera light
     m_renderEngineGL->params().enableSampleAlphaToCoverage = false;
-    m_renderEngineGL->params().enableSceneMaterials = false;
+    m_renderEngineGL->params().enableSceneMaterials = true;
     m_renderEngineGL->params().enableSceneLights = true;
     m_renderEngineGL->params().flipFrontFacing = true;
     m_renderEngineGL->params().gammaCorrectColors = false;
@@ -210,6 +208,17 @@ void ViewportOpenGLWidget::paintGL()
 
     m_drawTarget->unbind();
     m_drawTarget->draw();
+
+    if (m_showRendererStats) {
+        hudDrawRendereStats();
+    }
+}
+
+void ViewportOpenGLWidget::setShowRendererStats(bool val)
+{
+    m_showRendererStats = val;
+
+    update();
 }
 
 void ViewportOpenGLWidget::wheelEvent(QWheelEvent* event)
@@ -260,7 +269,7 @@ void ViewportOpenGLWidget::mousePressEvent(QMouseEvent* event)
         pxr::GfVec3d outHitPoint;
         pxr::SdfPath outHitInstancerPath;
         pxr::SdfPath outHitPrimPath;
-        auto         hit = m_renderEngineGL->getUsdImagingGLEngine()->TestIntersection(
+        auto hit = m_renderEngineGL->getUsdImagingGLEngine()->TestIntersection(
             pickFrustum.ComputeViewMatrix(),
             pickFrustum.ComputeProjectionMatrix(),
             m_stage->GetPseudoRoot(),
@@ -315,5 +324,57 @@ void ViewportOpenGLWidget::mouseReleaseEvent(QMouseEvent* event)
 {
     m_usdCamera->setDragMode(UsdCamera::DragMode::NONE);
 }
+
+double ViewportOpenGLWidget::nearClip() const
+{
+    return m_usdCamera ? m_usdCamera->nearClip() : 0.01;
+}
+
+double ViewportOpenGLWidget::farClip() const
+{
+    return m_usdCamera ? m_usdCamera->farClip() : 1000000.0;
+}
+
+void ViewportOpenGLWidget::setClipPlanes(double nearClip, double farClip)
+{
+    if (!m_usdCamera) {
+        return;
+    }
+
+    m_usdCamera->setClippingRange(nearClip, farClip);
+    m_usdCamera->updateTransform();
+
+    update();
+}
+
+void ViewportOpenGLWidget::hudDrawRendereStats()
+{
+    QStringList lines;
+
+    lines << QStringLiteral("Renderer: %1").arg(QString::fromStdString(m_renderEngineGL->rendererDisplayName()));
+  
+    auto hgiApiName = m_renderEngineGL->getUsdImagingGLEngine()->GetHgi()->GetAPIName();
+    lines << QStringLiteral("Hgi: %1").arg(QString::fromStdString(hgiApiName.GetString()));
+
+    lines << "==================== ";
+    lines << "Render Statistics: ";
+    lines << "==================== ";
+
+    auto renderStatsDict = m_renderEngineGL->getUsdImagingGLEngine()->GetRenderStats();
+    for (const auto& kv : renderStatsDict) {
+        const std::string& key = kv.first;
+        const VtValue& value   = kv.second;
+
+        lines << QStringLiteral("%1 = %2")
+                     .arg(QString::fromStdString(key))
+                     .arg(QString::fromStdString(TfStringify(value)));
+    }
+
+    QString hudText = lines.join("\n");
+
+    m_hud.updateText(hudText, float(devicePixelRatioF()), 14);
+    m_hud.draw(width(), height(), float(devicePixelRatioF()));
+}
+
 
 } // namespace TINKERUSD_NS

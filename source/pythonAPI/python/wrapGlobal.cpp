@@ -5,4 +5,10 @@
 
 using namespace PXR_BOOST_PYTHON_NAMESPACE;
 
-void wrapGlobal() { def("stage", TINKERUSD_NS::stage); }
+void wrapGlobal() 
+{ 
+	def("stage", TINKERUSD_NS::stage); 
+	def("editTargetLayer", TINKERUSD_NS::editTargetLayer);
+	def("primSel", TINKERUSD_NS::primSel);
+	def("primSelPath", TINKERUSD_NS::primSelPath);
+}

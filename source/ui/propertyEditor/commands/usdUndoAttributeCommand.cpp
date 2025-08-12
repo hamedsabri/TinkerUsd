@@ -4,9 +4,9 @@ namespace TINKERUSD_NS
 {
 
 UsdUndoAttributeCommand::UsdUndoAttributeCommand(
-    UsdAttributeWrapper*   wrapper,
+    UsdAttributeWrapper* wrapper,
     const PXR_NS::VtValue& newValue,
-    PXR_NS::UsdTimeCode    time)
+    PXR_NS::UsdTimeCode time)
     : UndoCommand(wrapper->displayName())
 {
     UsdUndoBlock undoBlock(&m_undoableItem);
@@ -14,8 +14,22 @@ UsdUndoAttributeCommand::UsdUndoAttributeCommand(
     wrapper->set(newValue, time);
 }
 
-void UsdUndoAttributeCommand::undo() { m_undoableItem.undo(); }
+void UsdUndoAttributeCommand::undo()
+{
+    m_undoableItem.undo();
 
-void UsdUndoAttributeCommand::redo() { m_undoableItem.redo(); }
+    if (m_refreshCallback) {
+      m_refreshCallback();  
+    } 
+}
+
+void UsdUndoAttributeCommand::redo()
+{
+    m_undoableItem.redo();
+
+    if (m_refreshCallback) {
+      m_refreshCallback();  
+    }
+}
 
 } // namespace TINKERUSD_NS
